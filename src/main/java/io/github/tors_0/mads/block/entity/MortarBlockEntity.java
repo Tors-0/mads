@@ -1,12 +1,15 @@
 package io.github.tors_0.mads.block.entity;
 
+import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
 import io.github.tors_0.mads.screen.MortarScreenHandler;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.InventoryProvider;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
+import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -18,9 +21,10 @@ import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
-public class MortarBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory {
+public class MortarBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory, InventoryProvider, PropertyDelegateHolder {
     private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(1, ItemStack.EMPTY);
 
     protected final PropertyDelegate propertyDelegate;
@@ -133,5 +137,15 @@ public class MortarBlockEntity extends BlockEntity implements ExtendedScreenHand
 
     private boolean hasRecipe() {
         return this.getStack(0).isOf(Items.COBBLESTONE) && this.getStack(0).getCount() > 0;
+    }
+
+    @Override
+    public SidedInventory getInventory(BlockState state, WorldAccess world, BlockPos pos) {
+        return ImplementedInventory.of(inventory);
+    }
+
+    @Override
+    public PropertyDelegate getPropertyDelegate() {
+        return propertyDelegate;
     }
 }
