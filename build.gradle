@@ -36,6 +36,11 @@ loom {
 		}
 	}
 }
+// workaround for bug in quilt loom 1.3.3+
+project.configurations.configureEach {
+	exclude(group: "net.fabricmc", module: "fabric-loader")
+	exclude(group: "net.fabricmc.fabric-api")
+}
 
 // All the dependencies are declared at gradle/libs.version.toml and referenced with "libs.<id>"
 // See https://docs.gradle.org/current/userguide/platforms.html for information on how version catalogs work.
@@ -53,7 +58,9 @@ dependencies {
 
 	modImplementation include("io.github.cottonmc:LibGui:${libs.versions.libgui.get()}")
 
-	// QSL is not a complete API; You will need Quilted Fabric API to fill in the gaps.
+//	include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.3.6")))
+
+// QSL is not a complete API; You will need Quilted Fabric API to fill in the gaps.
 	// Quilted Fabric API will automatically pull in the correct QSL version.
 	modImplementation libs.quilted.fabric.api
 	// modImplementation libs.bundles.quilted.fabric.api // If you wish to use Fabric API's deprecated modules, you can replace the above line with this one

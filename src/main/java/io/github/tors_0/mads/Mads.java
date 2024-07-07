@@ -26,5 +26,7 @@ public class Mads implements ModInitializer {
 
         ModBlockEntities.registerBlockEntities();
         ModScreenHandlers.registerScreenHandlers();
+
+
     }
 }

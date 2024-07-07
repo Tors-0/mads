@@ -1,7 +1,7 @@
 package io.github.tors_0.mads.block.entity;
 
 import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
-import io.github.tors_0.mads.screen.MortarScreenHandler;
+import io.github.tors_0.mads.gui.MortarGuiDescription;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.InventoryProvider;
@@ -14,8 +14,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
@@ -24,7 +26,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
-public class MortarBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory, InventoryProvider, PropertyDelegateHolder {
+public class MortarBlockEntity extends BlockEntity implements ImplementedInventory, InventoryProvider, PropertyDelegateHolder, NamedScreenHandlerFactory {
     private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(1, ItemStack.EMPTY);
 
     protected final PropertyDelegate propertyDelegate;
@@ -83,22 +85,6 @@ public class MortarBlockEntity extends BlockEntity implements ExtendedScreenHand
     }
 
     @Override
-    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
-        buf.writeBlockPos(this.pos);
-    }
-
-    @Override
-    public Text getDisplayName() {
-        return Text.translatable("block.mads.mortar");
-    }
-
-    @Nullable
-    @Override
-    public ScreenHandler createMenu(int i, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-        return new MortarScreenHandler(i, playerInventory, this, this.propertyDelegate);
-    }
-
-    @Override
     public DefaultedList<ItemStack> getItems() {
         return inventory;
     }
@@ -147,5 +133,16 @@ public class MortarBlockEntity extends BlockEntity implements ExtendedScreenHand
     @Override
     public PropertyDelegate getPropertyDelegate() {
         return propertyDelegate;
+    }
+
+    @Override
+    public Text getDisplayName() {
+        return Text.translatable(getCachedState().getBlock().getTranslationKey());
+    }
+
+    @Nullable
+    @Override
+    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+        return new MortarGuiDescription(syncId, playerInventory, ScreenHandlerContext.create(world, pos));
     }
 }

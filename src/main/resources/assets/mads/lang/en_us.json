@@ -1,3 +1,6 @@
 {
-  "block.mads.mortar": "Mortar"
+  "block.mads.mortar": "Mortar",
+
+  "text.mads.angle": "Angle: %d",
+  "text.mads.rot": "Rotation: %d"
 }
