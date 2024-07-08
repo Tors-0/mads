@@ -1,6 +1,6 @@
 package io.github.tors_0.mads.block;
 
-import io.github.tors_0.mads.block.entity.ModBlockEntities;
+import io.github.tors_0.mads.registry.ModBlockEntities;
 import io.github.tors_0.mads.block.entity.MortarBlockEntity;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -8,6 +8,8 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.state.property.IntProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
@@ -19,7 +21,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class MortarBlock extends BlockWithEntity implements BlockEntityProvider {
-private static final VoxelShape SHAPE = MortarBlock.createCuboidShape(0,0,0,16,15,16);
+    private static final VoxelShape SHAPE = MortarBlock.createCuboidShape(0,0,0,16,15,16);
 
     public MortarBlock(Settings settings) {
         super(settings);
@@ -32,7 +34,7 @@ private static final VoxelShape SHAPE = MortarBlock.createCuboidShape(0,0,0,16,1
 
     @Override
     public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
+        return BlockRenderType.INVISIBLE;
     }
 
     @Nullable

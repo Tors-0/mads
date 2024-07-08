@@ -16,7 +16,7 @@
         "intermediate_mappings": "net.fabricmc:intermediary",
         "entrypoints": {
             "init": "io.github.tors_0.mads.Mads",
-            "client_init": "io.github.tors_0.mads.MadsClient"
+            "client_init": "io.github.tors_0.mads.client.MadsClient"
         },
         "depends": [
             {

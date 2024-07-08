@@ -1,6 +1,8 @@
 package io.github.tors_0.mads;
 
-import io.github.tors_0.mads.block.entity.ModBlockEntities;
+import io.github.tors_0.mads.registry.ModBlockEntities;
+import io.github.tors_0.mads.registry.ModBlocks;
+import io.github.tors_0.mads.registry.ModItems;
 import io.github.tors_0.mads.screen.ModScreenHandlers;
 import net.minecraft.util.Identifier;
 import org.quiltmc.loader.api.ModContainer;

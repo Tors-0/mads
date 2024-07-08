@@ -1,39 +1,74 @@
 package io.github.tors_0.mads.block.entity;
 
 import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
+import io.github.cottonmc.cotton.gui.networking.ScreenNetworking;
 import io.github.tors_0.mads.gui.MortarGuiDescription;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import io.github.tors_0.mads.network.ModNetworking;
+import io.github.tors_0.mads.registry.ModBlockEntities;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.InventoryProvider;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.entity.projectile.ProjectileUtil;
+import net.minecraft.entity.projectile.thrown.SnowballEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
+import org.quiltmc.qsl.block.entity.api.QuiltBlockEntity;
+import org.quiltmc.qsl.networking.api.PacketByteBufs;
+import org.quiltmc.qsl.networking.api.PlayerLookup;
+import org.quiltmc.qsl.networking.api.ServerPlayNetworking;
 
-public class MortarBlockEntity extends BlockEntity implements ImplementedInventory, InventoryProvider, PropertyDelegateHolder, NamedScreenHandlerFactory {
+public class MortarBlockEntity extends BlockEntity implements ImplementedInventory, InventoryProvider, PropertyDelegateHolder, NamedScreenHandlerFactory, QuiltBlockEntity {
     private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(1, ItemStack.EMPTY);
 
     protected final PropertyDelegate propertyDelegate;
+
+    public void setRotation(int rotation) {
+        this.rotation = rotation;
+    }
+
+    public void setAngle(int angle) {
+        this.angle = angle;
+    }
+
     private int progress = 0;
     private int maxProgress = 72;
-    private int rot = 0;
-    private int angle = 88;
+
+    public int getRotation() {
+        return rotation;
+    }
+
+    public int getAngle() {
+        return angle;
+    }
+
+    private int rotation = 0;
+    private int angle = 89;
+
+    @Nullable
+    @Override
+    public BlockEntityUpdateS2CPacket toUpdatePacket() {
+        return BlockEntityUpdateS2CPacket.of(this);
+    }
 
     public MortarBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.MORTAR_BLOCK_ENTITY, pos, state);
@@ -43,9 +78,9 @@ public class MortarBlockEntity extends BlockEntity implements ImplementedInvento
                 return switch (index) {
                     case 0 -> MortarBlockEntity.this.progress;
                     case 1 -> MortarBlockEntity.this.maxProgress;
-                    case 2 -> MortarBlockEntity.this.rot;
+                    case 2 -> MortarBlockEntity.this.rotation;
                     case 3 -> MortarBlockEntity.this.angle;
-                    default -> 0;
+                    default -> -1;
                 };
             }
 
@@ -54,9 +89,10 @@ public class MortarBlockEntity extends BlockEntity implements ImplementedInvento
                 switch (index) {
                     case 0 -> MortarBlockEntity.this.progress = value;
                     case 1 -> MortarBlockEntity.this.maxProgress = value;
-                    case 2 -> MortarBlockEntity.this.rot = value;
+                    case 2 -> MortarBlockEntity.this.rotation = value;
                     case 3 -> MortarBlockEntity.this.angle = value;
                 }
+                markDirty();
             }
 
             @Override
@@ -71,8 +107,10 @@ public class MortarBlockEntity extends BlockEntity implements ImplementedInvento
         super.readNbt(nbt);
         Inventories.readNbt(nbt, inventory);
         progress = nbt.getInt("mortar.progress");
-        rot = nbt.getInt("mortar.rot");
+        rotation = nbt.getInt("mortar.rot");
         angle = nbt.getInt("mortar.angle");
+
+//        this.sync();
     }
 
     @Override
@@ -80,7 +118,7 @@ public class MortarBlockEntity extends BlockEntity implements ImplementedInvento
         super.writeNbt(nbt);
         Inventories.writeNbt(nbt, inventory);
         nbt.putInt("mortar.progress", progress);
-        nbt.putInt("mortar.rot", rot);
+        nbt.putInt("mortar.rot", rotation);
         nbt.putInt("mortar.angle", angle);
     }
 
@@ -109,8 +147,35 @@ public class MortarBlockEntity extends BlockEntity implements ImplementedInvento
         this.progress = 0;
     }
 
+    public static float clampYaw(float yaw) {
+        yaw = yaw % 360; // Gets the remainder when dividing angle by 360
+        if(yaw < 0) {
+            yaw = 360 - yaw;
+        }
+        return yaw;
+    }
+
+    /**
+     * Creates a Vec3 using the pitch and yaw of the entity's rotation.
+     */
+    protected final Vec3d getVectorForRotation(float pitch, float yaw)
+    {
+        float f = MathHelper.cos(-yaw * 0.017453292F - (float)Math.PI);
+        float f1 = MathHelper.sin(-yaw * 0.017453292F - (float)Math.PI);
+        float f2 = -MathHelper.cos(-pitch * 0.017453292F);
+        float f3 = MathHelper.sin(-pitch * 0.017453292F);
+        return new Vec3d(f1 * f2, f3, f * f2);
+    }
+
     private void launch() {
         this.removeStack(0, 1);
+        Vec3d pos = this.pos.ofCenter().add(0,.5,0);
+        SnowballEntity snowball = new SnowballEntity(getWorld(), pos.getX(), pos.getY(), pos.getZ());
+
+        Vec3d velocity = getVectorForRotation(angle, clampYaw(rotation)).multiply(-1);
+
+        snowball.setVelocity(velocity.getX(), velocity.getY(), velocity.getZ(), 3f, 0.1f);
+        world.spawnEntity(snowball);
     }
 
     private boolean hasLaunchingFinished() {

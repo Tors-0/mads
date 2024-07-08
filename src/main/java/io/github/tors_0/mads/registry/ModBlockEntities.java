@@ -1,7 +1,7 @@
-package io.github.tors_0.mads.block.entity;
+package io.github.tors_0.mads.registry;
 
 import io.github.tors_0.mads.Mads;
-import io.github.tors_0.mads.ModBlocks;
+import io.github.tors_0.mads.block.entity.MortarBlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;

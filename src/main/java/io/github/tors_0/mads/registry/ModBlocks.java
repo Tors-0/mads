@@ -1,5 +1,6 @@
-package io.github.tors_0.mads;
+package io.github.tors_0.mads.registry;
 
+import io.github.tors_0.mads.Mads;
 import io.github.tors_0.mads.block.MortarBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;

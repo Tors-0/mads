@@ -1,5 +1,6 @@
-package io.github.tors_0.mads;
+package io.github.tors_0.mads.registry;
 
+import io.github.tors_0.mads.Mads;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
