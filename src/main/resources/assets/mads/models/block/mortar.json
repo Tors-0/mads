@@ -2,7 +2,7 @@
 	"credit": "Made with Blockbench",
 	"textures": {
 		"0": "mads:block/mortar_top",
-		"1": "mads:block/mortar",
+		"1": "mads:block/mortarblock",
 		"2": "block/polished_andesite",
 		"3": "block/composter_bottom",
 		"particle": "block/composter_bottom"
@@ -27,9 +27,9 @@
 			"rotation": {"angle": 0, "axis": "y", "origin": [8, 11, 8]},
 			"faces": {
 				"north": {"uv": [4, 2, 7, 4], "texture": "#3"},
-				"east": {"uv": [7, 4, 9, 14], "rotation": 90, "texture": "#3"},
+				"east": {"uv": [6, 4, 8, 14], "rotation": 90, "texture": "#3"},
 				"south": {"uv": [4, 2, 7, 4], "texture": "#3"},
-				"west": {"uv": [7, 4, 9, 14], "rotation": 90, "texture": "#3"},
+				"west": {"uv": [6, 4, 8, 14], "rotation": 90, "texture": "#3"},
 				"up": {"uv": [0, 2, 3, 12], "texture": "#3"},
 				"down": {"uv": [0, 2, 3, 12], "texture": "#3"}
 			}
@@ -167,6 +167,37 @@
 			}
 		}
 	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [0, -45, 0],
+			"scale": [0.5, 0.5, 0.5]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [0, -45, 0],
+			"scale": [0.5, 0.5, 0.5]
+		},
+		"firstperson_righthand": {
+			"scale": [0.5, 0.5, 0.5]
+		},
+		"firstperson_lefthand": {
+			"scale": [0.5, 0.5, 0.5]
+		},
+		"ground": {
+			"scale": [0.25, 0.25, 0.25]
+		},
+		"gui": {
+			"rotation": [3, -45, 0],
+			"translation": [0, -3.25, 0],
+			"scale": [0.5, 0.5, 0.5]
+		},
+		"head": {
+			"translation": [0, 12.5, 0]
+		},
+		"fixed": {
+			"rotation": [-90, 0, 0],
+			"translation": [0, 0, -7]
+		}
+	},
 	"groups": [
 		{
 			"name": "assembly",

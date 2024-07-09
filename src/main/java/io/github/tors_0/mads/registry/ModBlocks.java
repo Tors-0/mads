@@ -19,7 +19,7 @@ public interface ModBlocks {
 
     Block MORTAR = createBlock("mortar", new MortarBlock(QuiltBlockSettings.copyOf(Blocks.IRON_BLOCK)), true);
 
-    static void initialize() {
+    static void registerBlocks() {
         BLOCKS.keySet().forEach(block -> {
             Registry.register(Registries.BLOCK, BLOCKS.get(block), block);
         });

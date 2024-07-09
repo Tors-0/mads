@@ -2,9 +2,13 @@ package io.github.tors_0.mads.block.entity;
 
 import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
 import io.github.cottonmc.cotton.gui.networking.ScreenNetworking;
+import io.github.tors_0.mads.entity.ShellEntity;
 import io.github.tors_0.mads.gui.MortarGuiDescription;
+import io.github.tors_0.mads.item.ShellItem;
 import io.github.tors_0.mads.network.ModNetworking;
 import io.github.tors_0.mads.registry.ModBlockEntities;
+import io.github.tors_0.mads.registry.ModItems;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.InventoryProvider;
 import net.minecraft.block.entity.BlockEntity;
@@ -19,11 +23,17 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+import net.minecraft.particle.ParticleEffect;
+import net.minecraft.particle.ParticleType;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -38,9 +48,10 @@ import org.quiltmc.qsl.networking.api.PlayerLookup;
 import org.quiltmc.qsl.networking.api.ServerPlayNetworking;
 
 public class MortarBlockEntity extends BlockEntity implements ImplementedInventory, InventoryProvider, PropertyDelegateHolder, NamedScreenHandlerFactory, QuiltBlockEntity {
-    private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(1, ItemStack.EMPTY);
+    private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(2, ItemStack.EMPTY);
 
     protected final PropertyDelegate propertyDelegate;
+    private int time = 0;
 
     public void setRotation(int rotation) {
         this.rotation = rotation;
@@ -62,7 +73,7 @@ public class MortarBlockEntity extends BlockEntity implements ImplementedInvento
     }
 
     private int rotation = 0;
-    private int angle = 89;
+    private int angle = 85;
 
     @Nullable
     @Override
@@ -109,8 +120,6 @@ public class MortarBlockEntity extends BlockEntity implements ImplementedInvento
         progress = nbt.getInt("mortar.progress");
         rotation = nbt.getInt("mortar.rot");
         angle = nbt.getInt("mortar.angle");
-
-//        this.sync();
     }
 
     @Override
@@ -129,8 +138,17 @@ public class MortarBlockEntity extends BlockEntity implements ImplementedInvento
 
     public void tick(World world, BlockPos blockPos, BlockState blockState) {
         if (world.isClient) return;
+        this.time++;
+        if (this.time >= 20) {
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeBlockPos(this.getPos());
+            buf.writeInt(this.getRotation());
+            buf.writeInt(this.getAngle());
+            ServerPlayNetworking.send(PlayerLookup.tracking((ServerWorld) world, this.getPos()), ModNetworking.MORTAR_ANGLES_SYNC_ID, buf);
+            this.time = 0;
+        }
 
-        if (this.hasRecipe()) {
+        if (this.hasRecipe() && this.getWorld().isReceivingRedstonePower(blockPos)) {
             this.increaseLaunchProgress();
             markDirty(world, blockPos, blockState);
 
@@ -158,7 +176,7 @@ public class MortarBlockEntity extends BlockEntity implements ImplementedInvento
     /**
      * Creates a Vec3 using the pitch and yaw of the entity's rotation.
      */
-    protected final Vec3d getVectorForRotation(float pitch, float yaw)
+    public static Vec3d getVectorForRotation(float pitch, float yaw)
     {
         float f = MathHelper.cos(-yaw * 0.017453292F - (float)Math.PI);
         float f1 = MathHelper.sin(-yaw * 0.017453292F - (float)Math.PI);
@@ -169,13 +187,16 @@ public class MortarBlockEntity extends BlockEntity implements ImplementedInvento
 
     private void launch() {
         this.removeStack(0, 1);
-        Vec3d pos = this.pos.ofCenter().add(0,.5,0);
-        SnowballEntity snowball = new SnowballEntity(getWorld(), pos.getX(), pos.getY(), pos.getZ());
+        this.removeStack(1, 1);
 
         Vec3d velocity = getVectorForRotation(angle, clampYaw(rotation)).multiply(-1);
+        Vec3d pos = this.pos.ofCenter().add(velocity.normalize().multiply(1.5));
+        ShellEntity shell = new ShellEntity(pos.getX(), pos.getY(), pos.getZ(), getWorld());
 
-        snowball.setVelocity(velocity.getX(), velocity.getY(), velocity.getZ(), 3f, 0.1f);
-        world.spawnEntity(snowball);
+        shell.setVelocity(velocity.getX(), velocity.getY(), velocity.getZ(), 2.5f, 0.1f);
+        world.spawnEntity(shell);
+        ((ServerWorld) world).spawnParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, pos.getX(), pos.getY(), pos.getZ(), 3, 0,0,0, 0.005);
+        world.playSound(null, this.pos, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 7f, 5f);
     }
 
     private boolean hasLaunchingFinished() {
@@ -187,7 +208,7 @@ public class MortarBlockEntity extends BlockEntity implements ImplementedInvento
     }
 
     private boolean hasRecipe() {
-        return this.getStack(0).isOf(Items.COBBLESTONE) && this.getStack(0).getCount() > 0;
+        return this.getStack(0).getItem() instanceof ShellItem && this.getStack(1).isOf(Items.GUNPOWDER);
     }
 
     @Override

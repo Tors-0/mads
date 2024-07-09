@@ -1,8 +1,6 @@
 package io.github.tors_0.mads;
 
-import io.github.tors_0.mads.registry.ModBlockEntities;
-import io.github.tors_0.mads.registry.ModBlocks;
-import io.github.tors_0.mads.registry.ModItems;
+import io.github.tors_0.mads.registry.*;
 import io.github.tors_0.mads.screen.ModScreenHandlers;
 import net.minecraft.util.Identifier;
 import org.quiltmc.loader.api.ModContainer;
@@ -23,12 +21,14 @@ public class Mads implements ModInitializer {
     public void onInitialize(ModContainer mod) {
         LOGGER.info("Hello Quilt world from {}! Stay fresh!", mod.metadata().name());
 
-        ModBlocks.initialize();
-        ModItems.initialize();
+        ModBlocks.registerBlocks();
+        ModItems.registerItemsAndBlockItems();
 
+        ModEntities.registerEntityTypes();
         ModBlockEntities.registerBlockEntities();
+
         ModScreenHandlers.registerScreenHandlers();
 
-
+        ModEventCallbacks.registerCallbacks();
     }
 }

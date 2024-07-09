@@ -1,3 +1,4 @@
 {
-  "parent": "mads:block/mortar"
+  "parent": "mads:block/mortar",
+  "gui_light": "front"
 }

@@ -1,6 +1,10 @@
 {
   "block.mads.mortar": "Mortar",
 
-  "text.mads.angle": "Angle: %d°",
-  "text.mads.rot": "Rotation: %d°"
+  "item.mads.empty_shell": "Empty Shell",
+  "item.mads.shell": "Explosive Shell",
+
+  "text.mads.angle": "Angle:",
+  "text.mads.rot": "Rotation:",
+  "label.mads.degrees": "%d°"
 }
