@@ -8,12 +8,15 @@ import io.github.tors_0.mads.gui.MortarGuiDescription;
 import io.github.tors_0.mads.network.ModNetworking;
 import io.github.tors_0.mads.registry.ModBlockEntities;
 import io.github.tors_0.mads.registry.ModEntities;
+import io.github.tors_0.mads.registry.ModItems;
 import io.github.tors_0.mads.screen.ModScreenHandlers;
 import io.github.tors_0.mads.screen.MortarScreen;
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
+import net.minecraft.potion.PotionUtil;
 import net.minecraft.util.math.BlockPos;
 import org.quiltmc.loader.api.ModContainer;
 import org.quiltmc.loader.api.minecraft.ClientOnly;
@@ -29,6 +32,10 @@ public class MadsClient implements ClientModInitializer {
 
         EntityModelLayerRegistry.registerModelLayer(MortarBlockEntityModel.LAYER_LOCATION, MortarBlockEntityModel::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(ShellEntityModel.LAYER_LOCATION, ShellEntityModel::getTexturedModelData);
+
+        ColorProviderRegistry.ITEM.register(((itemStack, tintIndex) -> {
+            return tintIndex != 0 ? -1 : PotionUtil.getColor(itemStack);
+        }), ModItems.TIPPED_SHELL);
 
         HandledScreens.<MortarGuiDescription, MortarScreen>register(ModScreenHandlers.MORTAR_SCREEN_HANDLER, (gui, inventory, title) -> new MortarScreen(gui, inventory.player, title));
 

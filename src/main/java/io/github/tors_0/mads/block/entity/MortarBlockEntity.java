@@ -1,21 +1,18 @@
 package io.github.tors_0.mads.block.entity;
 
 import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
-import io.github.cottonmc.cotton.gui.networking.ScreenNetworking;
 import io.github.tors_0.mads.entity.ShellEntity;
 import io.github.tors_0.mads.gui.MortarGuiDescription;
+import io.github.tors_0.mads.item.MortarProjectile;
 import io.github.tors_0.mads.item.ShellItem;
 import io.github.tors_0.mads.network.ModNetworking;
 import io.github.tors_0.mads.registry.ModBlockEntities;
 import io.github.tors_0.mads.registry.ModItems;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.InventoryProvider;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.entity.projectile.thrown.SnowballEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
@@ -23,8 +20,6 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleType;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
@@ -32,7 +27,6 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
@@ -186,17 +180,21 @@ public class MortarBlockEntity extends BlockEntity implements ImplementedInvento
     }
 
     private void launch() {
-        this.removeStack(0, 1);
-        this.removeStack(1, 1);
 
         Vec3d velocity = getVectorForRotation(angle, clampYaw(rotation)).multiply(-1);
         Vec3d pos = this.pos.ofCenter().add(velocity.normalize().multiply(1.5));
-        ShellEntity shell = new ShellEntity(pos.getX(), pos.getY(), pos.getZ(), getWorld());
+
+        ItemStack itemStack = this.getStack(0);
+        ShellItem shellItem = (ShellItem) (itemStack.getItem() instanceof ShellItem ? itemStack.getItem() : ModItems.SHELL);
+        ShellEntity shell = shellItem.createShell(getWorld(), itemStack, pos);
 
         shell.setVelocity(velocity.getX(), velocity.getY(), velocity.getZ(), 2.5f, 0.1f);
         world.spawnEntity(shell);
         ((ServerWorld) world).spawnParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, pos.getX(), pos.getY(), pos.getZ(), 3, 0,0,0, 0.005);
         world.playSound(null, this.pos, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 7f, 5f);
+
+        this.removeStack(0, 1);
+        this.removeStack(1, 1);
     }
 
     private boolean hasLaunchingFinished() {
@@ -208,7 +206,7 @@ public class MortarBlockEntity extends BlockEntity implements ImplementedInvento
     }
 
     private boolean hasRecipe() {
-        return this.getStack(0).getItem() instanceof ShellItem && this.getStack(1).isOf(Items.GUNPOWDER);
+        return this.getStack(0).getItem() instanceof MortarProjectile && this.getStack(1).isOf(Items.GUNPOWDER);
     }
 
     @Override

@@ -2,6 +2,7 @@ package io.github.tors_0.mads.registry;
 
 import io.github.tors_0.mads.Mads;
 import io.github.tors_0.mads.item.ShellItem;
+import io.github.tors_0.mads.item.TippedShellItem;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroups;
@@ -18,6 +19,7 @@ public interface ModItems {
 
     Item EMPTY_SHELL = createItem("empty_shell", new Item(new QuiltItemSettings()));
     Item SHELL = createItem("shell", new ShellItem(new QuiltItemSettings().maxCount(16)));
+    Item TIPPED_SHELL = createItem("tipped_shell", new TippedShellItem(new QuiltItemSettings().maxCount(16)));
 
     private static <T extends Item> T createItem(String name, T item) {
         ITEMS.put(item, new Identifier(Mads.ID, name));

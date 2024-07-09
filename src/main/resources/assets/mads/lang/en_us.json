@@ -4,6 +4,8 @@
   "item.mads.empty_shell": "Empty Shell",
   "item.mads.shell": "Explosive Shell",
 
+  "entity.mads.shell": "M107 Artillery Mortar Projectile",
+
   "text.mads.angle": "Angle:",
   "text.mads.rot": "Rotation:",
   "label.mads.degrees": "%d°"
