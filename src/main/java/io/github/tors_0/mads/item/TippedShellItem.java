@@ -15,8 +15,16 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class TippedShellItem extends TippedArrowItem implements MortarProjectile {
-    public TippedShellItem(Settings settings) {
+    @Override
+    public boolean isArmed() {
+        return armed;
+    }
+
+    private final boolean armed;
+
+    public TippedShellItem(Settings settings, boolean armed) {
         super(settings);
+        this.armed = armed;
     }
 
     @Override

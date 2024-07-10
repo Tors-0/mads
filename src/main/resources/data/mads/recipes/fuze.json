@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "B",
+    "#",
+    "!"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:iron_nugget"
+    },
+    "B": {
+      "item": "minecraft:polished_blackstone_button"
+    },
+    "!": {
+      "item": "minecraft:redstone_torch"
+    }
+  },
+  "result": {
+    "item": "mads:fuze",
+    "count": 4
+  }
+}

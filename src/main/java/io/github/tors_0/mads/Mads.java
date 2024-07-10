@@ -1,7 +1,10 @@
 package io.github.tors_0.mads;
 
+import io.github.tors_0.mads.recipe.TippedShellRecipe;
 import io.github.tors_0.mads.registry.*;
 import io.github.tors_0.mads.screen.ModScreenHandlers;
+import net.minecraft.recipe.RecipeSerializer;
+import net.minecraft.recipe.SpecialRecipeSerializer;
 import net.minecraft.util.Identifier;
 import org.quiltmc.loader.api.ModContainer;
 import org.quiltmc.qsl.base.api.entrypoint.ModInitializer;
@@ -24,10 +27,12 @@ public class Mads implements ModInitializer {
         ModBlocks.registerBlocks();
         ModItems.registerItemsAndBlockItems();
 
+        ModScreenHandlers.registerScreenHandlers();
+
+        ModRecipeSerializers.registerRecipeSerializers();
+
         ModEntities.registerEntityTypes();
         ModBlockEntities.registerBlockEntities();
-
-        ModScreenHandlers.registerScreenHandlers();
 
         ModEventCallbacks.registerCallbacks();
     }

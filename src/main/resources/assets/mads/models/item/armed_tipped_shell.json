@@ -1,0 +1,7 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "mads:item/tipped_shell_head",
+    "layer1": "mads:item/armed_tipped_shell_base"
+  }
+}

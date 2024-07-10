@@ -6,8 +6,11 @@ import io.github.tors_0.mads.item.TippedShellItem;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroups;
+import net.minecraft.item.ItemStack;
+import net.minecraft.potion.PotionUtil;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 import org.quiltmc.qsl.item.setting.api.QuiltItemSettings;
 
@@ -18,8 +21,11 @@ public interface ModItems {
     Map<Item, Identifier> ITEMS = new LinkedHashMap<>();
 
     Item EMPTY_SHELL = createItem("empty_shell", new Item(new QuiltItemSettings()));
-    Item SHELL = createItem("shell", new ShellItem(new QuiltItemSettings().maxCount(16)));
-    Item TIPPED_SHELL = createItem("tipped_shell", new TippedShellItem(new QuiltItemSettings().maxCount(16)));
+    Item SHELL = createItem("shell", new ShellItem(new QuiltItemSettings().maxCount(16), false));
+    Item ARMED_SHELL = createItem("armed_shell", new ShellItem(new QuiltItemSettings().maxCount(16), true));
+    Item TIPPED_SHELL = createItem("tipped_shell", new TippedShellItem(new QuiltItemSettings().maxCount(16), false));
+    Item ARMED_TIPPED_SHELL = createItem("armed_tipped_shell", new TippedShellItem(new QuiltItemSettings().maxCount(16), true));
+    Item FUZE = createItem("fuze", new Item(new QuiltItemSettings()));
 
     private static <T extends Item> T createItem(String name, T item) {
         ITEMS.put(item, new Identifier(Mads.ID, name));
@@ -31,6 +37,14 @@ public interface ModItems {
             Registry.register(Registries.ITEM, ITEMS.get(item), item);
         });
 
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(entries -> ITEMS.keySet().forEach(entries::addItem));
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(entries -> {
+            entries.addItem(ModBlocks.MORTAR.asItem());
+            entries.addItem(EMPTY_SHELL);
+            entries.addItem(FUZE);
+            entries.addItem(SHELL);
+            entries.addItem(ARMED_SHELL);
+
+            Registries.POTION.forEach(potion -> entries.addStack(PotionUtil.setPotion(new ItemStack(ModItems.ARMED_TIPPED_SHELL), potion)));
+        });
     }
 }

@@ -36,6 +36,9 @@ public class MadsClient implements ClientModInitializer {
         ColorProviderRegistry.ITEM.register(((itemStack, tintIndex) -> {
             return tintIndex != 0 ? -1 : PotionUtil.getColor(itemStack);
         }), ModItems.TIPPED_SHELL);
+        ColorProviderRegistry.ITEM.register(((itemStack, tintIndex) -> {
+            return tintIndex != 0 ? -1 : PotionUtil.getColor(itemStack);
+        }), ModItems.ARMED_TIPPED_SHELL);
 
         HandledScreens.<MortarGuiDescription, MortarScreen>register(ModScreenHandlers.MORTAR_SCREEN_HANDLER, (gui, inventory, title) -> new MortarScreen(gui, inventory.player, title));
 

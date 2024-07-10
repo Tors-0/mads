@@ -206,7 +206,7 @@ public class MortarBlockEntity extends BlockEntity implements ImplementedInvento
     }
 
     private boolean hasRecipe() {
-        return this.getStack(0).getItem() instanceof MortarProjectile && this.getStack(1).isOf(Items.GUNPOWDER);
+        return this.getStack(0).getItem() instanceof MortarProjectile projectile && projectile.isArmed() && this.getStack(1).isOf(Items.GUNPOWDER);
     }
 
     @Override

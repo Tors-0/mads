@@ -67,7 +67,7 @@ public class ShellEntity extends PersistentProjectileEntity {
     }
 
     public void initFromStack(ItemStack stack) {
-    if (stack.isOf(ModItems.TIPPED_SHELL)) {
+        if (stack.isOf(ModItems.ARMED_TIPPED_SHELL)) {
             this.potion = PotionUtil.getPotion(stack);
             Collection<StatusEffectInstance> collection = PotionUtil.getCustomPotionEffects(stack);
             if (!collection.isEmpty()) {
@@ -82,7 +82,7 @@ public class ShellEntity extends PersistentProjectileEntity {
             } else {
                 this.setColor(i);
             }
-        } else if (stack.isOf(ModItems.SHELL)) {
+        } else if (stack.isOf(ModItems.ARMED_SHELL)) {
             this.potion = Potions.EMPTY;
             this.effects.clear();
             this.dataTracker.set(COLOR, -1);
@@ -200,7 +200,14 @@ public class ShellEntity extends PersistentProjectileEntity {
             areaEffectCloud.setPotion(potion);
 
             for (StatusEffectInstance statusEffectInstance : PotionUtil.getPotionEffects(this.potion, potion.getEffects())) {
-                areaEffectCloud.addEffect(new StatusEffectInstance(statusEffectInstance));
+                areaEffectCloud.addEffect(
+                        new StatusEffectInstance(
+                                statusEffectInstance.getEffectType(),
+                                Math.max(statusEffectInstance.mapDuration(i -> i / 8), 1),
+                                statusEffectInstance.getAmplifier(),
+                                statusEffectInstance.isAmbient(),
+                                statusEffectInstance.shouldShowParticles()
+                        ));
             }
 
             areaEffectCloud.setColor(this.getColor());
@@ -227,10 +234,20 @@ public class ShellEntity extends PersistentProjectileEntity {
         Entity entity = entityHitResult.getEntity();
         if (entity instanceof LivingEntity && !(entity instanceof EndermanEntity)) {
             entity.damage(this.getDamageSources().mobProjectile(this, null), 10f);
-            entity.addVelocity(this.getVelocity().multiply(0.4));
+            entity.addVelocity(this.getVelocity());
             entity.velocityDirty = true;
-            if (this.potion != Potions.EMPTY) {
-                this.potion.getEffects().forEach(((LivingEntity) entity)::addStatusEffect);
+
+            for (StatusEffectInstance statusEffectInstance : this.potion.getEffects()) {
+                ((LivingEntity) entity).addStatusEffect(
+                        new StatusEffectInstance(
+                                statusEffectInstance.getEffectType(),
+                                Math.max(statusEffectInstance.mapDuration(i -> i / 8), 1),
+                                statusEffectInstance.getAmplifier(),
+                                statusEffectInstance.isAmbient(),
+                                statusEffectInstance.shouldShowParticles()
+                        ),
+                        this
+                );
             }
         }
     }
@@ -238,9 +255,9 @@ public class ShellEntity extends PersistentProjectileEntity {
     @Override
     protected ItemStack asItemStack() {
         if (this.effects.isEmpty() && this.potion == Potions.EMPTY) {
-            return new ItemStack(ModItems.SHELL);
+            return new ItemStack(ModItems.ARMED_SHELL);
         } else {
-            ItemStack itemStack = new ItemStack(ModItems.TIPPED_SHELL);
+            ItemStack itemStack = new ItemStack(ModItems.ARMED_TIPPED_SHELL);
             PotionUtil.setPotion(itemStack, this.potion);
             PotionUtil.setCustomPotionEffects(itemStack, this.effects);
             if (this.colorSet) {
