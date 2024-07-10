@@ -40,8 +40,8 @@ public interface ModItems {
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(entries -> {
             entries.addItem(ModBlocks.MORTAR.asItem());
             entries.addItem(EMPTY_SHELL);
-            entries.addItem(FUZE);
             entries.addItem(SHELL);
+            entries.addItem(FUZE);
             entries.addItem(ARMED_SHELL);
 
             Registries.POTION.forEach(potion -> entries.addStack(PotionUtil.setPotion(new ItemStack(ModItems.ARMED_TIPPED_SHELL), potion)));

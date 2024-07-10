@@ -5,6 +5,7 @@ import io.github.cottonmc.cotton.gui.client.BackgroundPainter;
 import io.github.cottonmc.cotton.gui.networking.NetworkSide;
 import io.github.cottonmc.cotton.gui.networking.ScreenNetworking;
 import io.github.cottonmc.cotton.gui.widget.*;
+import io.github.cottonmc.cotton.gui.widget.data.Axis;
 import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
 import io.github.cottonmc.cotton.gui.widget.data.Insets;
 import io.github.cottonmc.cotton.gui.widget.data.Texture;
@@ -18,8 +19,11 @@ import io.github.tors_0.mads.screen.ModScreenHandlers;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
+import net.minecraft.screen.ScreenHandlerListener;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -54,22 +58,10 @@ public class MortarGuiDescription extends SyncedGuiDescription {
         ScreenNetworking.of(this, NetworkSide.SERVER).receive(ANGLE_MESSAGE, data -> {
             int newAngle = data.readInt();
             this.propertyDelegate.set(3, newAngle); // modify server value
-
-//            ScreenNetworking.of(this, NetworkSide.SERVER).send(ANGLE_SERVER_MESSAGE,
-//                    packetByteBuf -> {
-//                        packetByteBuf.writeBlockPos(blockPos.get());
-//                        packetByteBuf.writeInt(prevAngle + deltaAngle);
-//                    }); // inform clients of updated value
         });
         ScreenNetworking.of(this, NetworkSide.SERVER).receive(ROT_MESSAGE, data -> {
             int newRot = data.readInt();
             this.propertyDelegate.set(2, newRot); // update server value
-
-//            ScreenNetworking.of(this, NetworkSide.SERVER).send(ROT_SERVER_MESSAGE,
-//                    packetByteBuf -> {
-//                        packetByteBuf.writeBlockPos(blockPos.get());
-//                        packetByteBuf.writeInt(newRot);
-//                    }); // inform clients of updated value
         });
         ScreenNetworking.of(this, NetworkSide.CLIENT).receive(ANGLE_SERVER_MESSAGE, data -> {
             world.getBlockEntity(data.readBlockPos(), ModBlockEntities.MORTAR_BLOCK_ENTITY).get().getPropertyDelegate().set(3, data.readInt());
@@ -92,49 +84,63 @@ public class MortarGuiDescription extends SyncedGuiDescription {
         gunpowSlot.setIcon(GUNPOW_ICON);
         root.add(gunpowSlot, 72, 40);
 
+        WSlider angleSlider = new WSlider(60, 85, Axis.VERTICAL);
+        angleSlider.setValueChangeListener(val -> this.propertyDelegate.set(3, val));
+        root.add(angleSlider, 32,40,8,35);
+
         WLabel angleLabel = new WLabel(Text.translatable("text.mads.angle"));
         angleLabel.setHorizontalAlignment(HorizontalAlignment.CENTER);
         root.add(angleLabel, 0, 15, 72, 20);
-        WDynamicLabel angle = new WDynamicLabel(() -> I18n.translate("label.mads.degrees", this.propertyDelegate.get(3)));
+        WDynamicLabel angle = new WDynamicLabel(() -> {
+            angleSlider.setValue(propertyDelegate.get(3));
+            return I18n.translate("label.mads.degrees", this.propertyDelegate.get(3));
+        });
         angle.setAlignment(HorizontalAlignment.CENTER);
         root.add(angle, 0, 28, 72, 20);
+
+        WSlider rotSlider = new WSlider(0, 359, Axis.HORIZONTAL);
+        rotSlider.setValueChangeListener(val -> this.propertyDelegate.set(2, val));
+        root.add(rotSlider, 100, 40, 52, 18);
 
         WLabel rotLabel = new WLabel(Text.translatable("text.mads.rot"));
         rotLabel.setHorizontalAlignment(HorizontalAlignment.CENTER);
         root.add(rotLabel, 90, 15, 72, 20);
-        WDynamicLabel rotation = new WDynamicLabel(() -> I18n.translate("label.mads.degrees", this.propertyDelegate.get(2)));
+        WDynamicLabel rotation = new WDynamicLabel(() -> {
+            rotSlider.setValue(this.propertyDelegate.get(2));
+            return I18n.translate("label.mads.degrees", this.propertyDelegate.get(2));
+        });
         rotation.setAlignment(HorizontalAlignment.CENTER);
         root.add(rotation, 90, 28,72,20);
 
         // angle buttons
-        WButton angleUp = new WButton(Text.literal("↑"));
-        angleUp.setOnClick(() -> {
-            int ang = this.propertyDelegate.get(3);
-            this.propertyDelegate.set(3, ang >= 85 ? 85 : ang + 1);
-        });
-        root.add(angleUp, 20,40, 15, 20);
-
-        WButton angleDown = new WButton(Text.literal("↓"));
-        angleDown.setOnClick(() -> {
-            int ang = this.propertyDelegate.get(3);
-            this.propertyDelegate.set(3, ang <= 60 ? ang : ang - 1);
-        });
-        root.add(angleDown, 38,40, 15, 20);
+//        WButton angleUp = new WButton(Text.literal("↑"));
+//        angleUp.setOnClick(() -> {
+//            int ang = this.propertyDelegate.get(3);
+//            this.propertyDelegate.set(3, ang >= 85 ? 85 : ang + 1);
+//        });
+//        root.add(angleUp, 20,40, 15, 20);
+//
+//        WButton angleDown = new WButton(Text.literal("↓"));
+//        angleDown.setOnClick(() -> {
+//            int ang = this.propertyDelegate.get(3);
+//            this.propertyDelegate.set(3, ang <= 60 ? ang : ang - 1);
+//        });
+//        root.add(angleDown, 38,40, 15, 20);
 
         // rotation buttons
-        WButton rotLeft = new WButton(Text.literal("←"));
-        rotLeft.setOnClick(() -> {
-            int rot = this.propertyDelegate.get(2);
-            this.propertyDelegate.set(2, rot - 10 < 0 ? 360 + rot - 10 : rot - 10);
-        });
-        root.add(rotLeft, 110,40, 15, 20);
-
-        WButton rotRight = new WButton(Text.literal("→"));
-        rotRight.setOnClick(() -> {
-            int rot = this.propertyDelegate.get(2);
-            this.propertyDelegate.set(2, rot + 10 >= 360 ? 0 : rot + 10);
-        });
-        root.add(rotRight, 128,40, 15, 20);
+//        WButton rotLeft = new WButton(Text.literal("←"));
+//        rotLeft.setOnClick(() -> {
+//            int rot = this.propertyDelegate.get(2);
+//            this.propertyDelegate.set(2, rot - 10 < 0 ? 360 + rot - 10 : rot - 10);
+//        });
+//        root.add(rotLeft, 110,40, 15, 20);
+//
+//        WButton rotRight = new WButton(Text.literal("→"));
+//        rotRight.setOnClick(() -> {
+//            int rot = this.propertyDelegate.get(2);
+//            this.propertyDelegate.set(2, rot + 10 >= 360 ? 0 : rot + 10);
+//        });
+//        root.add(rotRight, 128,40, 15, 20);
 
         WButton setButton = new WButton(Text.literal("✔"));
         setButton.setOnClick(() -> {

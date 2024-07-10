@@ -142,7 +142,7 @@ public class MortarBlockEntity extends BlockEntity implements ImplementedInvento
             this.time = 0;
         }
 
-        if (this.hasRecipe() && this.getWorld().isReceivingRedstonePower(blockPos)) {
+        if (this.hasRecipe() && (this.progress > 0 || this.getWorld().isReceivingRedstonePower(blockPos))) {
             this.increaseLaunchProgress();
             markDirty(world, blockPos, blockState);
 
