@@ -6,7 +6,6 @@ import io.github.tors_0.mads.misc.IncendiaryExplosion;
 import io.github.tors_0.mads.misc.IncendiaryExplosionBehavior;
 import io.github.tors_0.mads.registry.ModEntities;
 import io.github.tors_0.mads.registry.ModItems;
-import net.fabricmc.fabric.impl.content.registry.FlammableBlockRegistryImpl;
 import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.AreaEffectCloudEntity;
@@ -29,9 +28,9 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -39,7 +38,6 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 import net.minecraft.world.explosion.ExplosionBehavior;
-import org.quiltmc.qsl.block.content.registry.api.FlammableBlockEntry;
 
 import java.util.Collection;
 import java.util.Set;
@@ -79,10 +77,31 @@ public class ShellEntity extends PersistentProjectileEntity {
         return !this.incendiary;
     }
 
+    @Override
+    public Text getName() {
+        switch (this.dataTracker.get(COLOR)) {
+            case -1 -> {
+                return Text.translatable("entity.mads.shell");
+            }
+            case -2 -> {
+                return Text.translatable("entity.mads.shell.napalm");
+            }
+            case -3 -> {
+                return Text.translatable("entity.mads.shell.highyield");
+            }
+            case -4 -> {
+                return Text.translatable("entity.mads.shell.nuke");
+            }
+            default -> {
+                return Text.translatable("entity.mads.shell.tipped");
+            }
+        }
+    }
+
     protected void detonate() {
-        if (this.dataTracker.get(COLOR) != -2) {
+        if (this.dataTracker.get(COLOR) == -1) {
             this.getWorld().createExplosion(this, this.getDamageSources().explosion(this, this), new ExplosionBehavior(), this.getPos(), 2.3f, false, World.ExplosionSourceType.TNT);
-        } else {
+        } else if (this.dataTracker.get(COLOR) == -2) {
             IncendiaryExplosion napalm = new IncendiaryExplosion(getWorld(), this, this.getDamageSources().explosion(this, this),
                     new IncendiaryExplosionBehavior(), this.getX(), this.getY(), this.getZ(), 4f);
             napalm.collectBlocksAndDamageEntities();
@@ -95,8 +114,6 @@ public class ShellEntity extends PersistentProjectileEntity {
             }
 
             napalm.affectWorld(getWorld().isClient);
-
-            Mads.LOGGER.info("creating explosion at {}", this.getPos().toString());
         }
         this.discard();
     }

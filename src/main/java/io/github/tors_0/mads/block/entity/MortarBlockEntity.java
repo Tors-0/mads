@@ -57,7 +57,7 @@ public class MortarBlockEntity extends BlockEntity implements ImplementedInvento
     }
 
     private int progress = 0;
-    private int maxProgress = 20;
+    private int maxProgress = 72;
 
     public int getRotation() {
         return rotation;
