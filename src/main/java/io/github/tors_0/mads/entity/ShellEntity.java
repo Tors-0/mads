@@ -1,8 +1,14 @@
 package io.github.tors_0.mads.entity;
 
 import com.google.common.collect.Sets;
+import io.github.tors_0.mads.Mads;
+import io.github.tors_0.mads.misc.IncendiaryExplosion;
+import io.github.tors_0.mads.misc.IncendiaryExplosionBehavior;
 import io.github.tors_0.mads.registry.ModEntities;
 import io.github.tors_0.mads.registry.ModItems;
+import net.fabricmc.fabric.impl.content.registry.FlammableBlockRegistryImpl;
+import net.minecraft.block.AbstractFireBlock;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -13,10 +19,8 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
@@ -25,12 +29,17 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
+import net.minecraft.world.explosion.ExplosionBehavior;
+import org.quiltmc.qsl.block.content.registry.api.FlammableBlockEntry;
 
 import java.util.Collection;
 import java.util.Set;
@@ -44,6 +53,15 @@ public class ShellEntity extends PersistentProjectileEntity {
     private final Set<StatusEffectInstance> effects = Sets.<StatusEffectInstance>newHashSet();
     private boolean colorSet;
 
+    public boolean isIncendiary() {
+        return incendiary || this.dataTracker.get(COLOR) == -2;
+    }
+
+    private boolean incendiary = false;
+    public void setIncendiary() {
+        this.incendiary = true;
+    }
+
     public ShellEntity(double x, double y, double z, World world) {
         super(ModEntities.SHELL_ENTITY, x, y, z, world);
     }
@@ -56,9 +74,41 @@ public class ShellEntity extends PersistentProjectileEntity {
         super(entityType, world);
     }
 
+    @Override
+    public boolean canExplosionDestroyBlock(Explosion explosion, BlockView world, BlockPos pos, BlockState state, float explosionPower) {
+        return !this.incendiary;
+    }
+
     protected void detonate() {
-        this.getWorld().createExplosion(this, this.getX(), this.getY(), this.getZ(), 2.3f, false, World.ExplosionSourceType.TNT);
+        if (this.dataTracker.get(COLOR) != -2) {
+            this.getWorld().createExplosion(this, this.getX(), this.getY(), this.getZ(), 2.3f, false, World.ExplosionSourceType.TNT);
+        } else {
+            IncendiaryExplosion napalm = new IncendiaryExplosion(getWorld(), this, this.getDamageSources().explosion(this, this),
+                    new IncendiaryExplosionBehavior(), this.getX(), this.getY(), this.getZ(), 4f);
+            napalm.collectBlocksAndDamageEntities();
+
+            for (BlockPos blockPos3 : napalm.getAffectedBlocks()) {
+                if (!this.getWorld().getBlockState(blockPos3).isSolid()
+                        && this.getWorld().getBlockState(blockPos3.down()).isOpaqueFullCube(this.getWorld(), blockPos3.down())) {
+                    this.getWorld().setBlockState(blockPos3, AbstractFireBlock.getState(this.getWorld(), blockPos3));
+                }
+            }
+
+            napalm.affectWorld(getWorld().isClient);
+
+            Mads.LOGGER.info("creating explosion at {}", this.getPos().toString());
+        }
         this.discard();
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (this.getWorld().isClient) {
+            if (!this.inGround) {
+                this.spawnParticles(2);
+            }
+        }
     }
 
     @Override
@@ -86,6 +136,11 @@ public class ShellEntity extends PersistentProjectileEntity {
             this.potion = Potions.EMPTY;
             this.effects.clear();
             this.dataTracker.set(COLOR, -1);
+        } else if (stack.isOf(ModItems.ARMED_NAPALM_SHELL)) {
+            this.setIncendiary();
+            this.potion = Potions.EMPTY;
+            this.effects.clear();
+            this.dataTracker.set(COLOR, -2);
         }
     }
 
@@ -97,7 +152,7 @@ public class ShellEntity extends PersistentProjectileEntity {
     private void initColor() {
         this.colorSet = false;
         if (this.potion == Potions.EMPTY && this.effects.isEmpty()) {
-            this.dataTracker.set(COLOR, -1);
+            this.dataTracker.set(COLOR, this.incendiary ? -2 : -1);
         } else {
             this.dataTracker.set(COLOR, PotionUtil.getColor(PotionUtil.getPotionEffects(this.potion, this.effects)));
         }
@@ -122,13 +177,18 @@ public class ShellEntity extends PersistentProjectileEntity {
 
     private void spawnParticles(int amount) {
         int i = this.getColor();
-        if (i != -1 && amount > 0) {
+        if (i != -1 && i != -2 && amount > 0) {
             double d = (double)(i >> 16 & 0xFF) / 255.0;
             double e = (double)(i >> 8 & 0xFF) / 255.0;
             double f = (double)(i >> 0 & 0xFF) / 255.0;
 
             for (int j = 0; j < amount; j++) {
                 this.getWorld().addParticle(ParticleTypes.ENTITY_EFFECT, this.getParticleX(0.5), this.getRandomBodyY(), this.getParticleZ(0.5), d, e, f);
+            }
+        }
+        if (this.isIncendiary() && amount > 0) {
+            for (int j = 0; j < amount * 2; j++) {
+                this.getWorld().addParticle(ParticleTypes.FLAME, this.getParticleX(0.5), this.getRandomBodyY(), this.getParticleZ(0.5),0,0,0);
             }
         }
     }
@@ -162,6 +222,7 @@ public class ShellEntity extends PersistentProjectileEntity {
 
             nbt.put("CustomPotionEffects", nbtList);
         }
+        nbt.putBoolean("shell.incendiary", this.incendiary);
     }
 
     @Override
@@ -174,6 +235,7 @@ public class ShellEntity extends PersistentProjectileEntity {
         for (StatusEffectInstance statusEffectInstance : PotionUtil.getCustomPotionEffects(nbt)) {
             this.addEffect(statusEffectInstance);
         }
+        this.incendiary = nbt.getBoolean("shell.incendiary");
 
         if (nbt.contains("Color", NbtElement.NUMBER_TYPE)) {
             this.setColor(nbt.getInt("Color"));
@@ -224,7 +286,7 @@ public class ShellEntity extends PersistentProjectileEntity {
                             (1.0F + (this.getWorld().random.nextFloat() - this.getWorld().random.nextFloat()) * 0.2F) * 0.7F
                     );
             this.discard();
-        } else {
+        } else if (!getWorld().isClient) {
             this.detonate();
         }
     }

@@ -1,20 +1,13 @@
 package io.github.tors_0.mads.client.render;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import io.github.tors_0.mads.block.entity.MortarBlockEntity;
-import io.github.tors_0.mads.client.render.model.MortarBlockEntityModel;
 import io.github.tors_0.mads.client.render.model.ShellEntityModel;
 import io.github.tors_0.mads.entity.ShellEntity;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.ProjectileEntityRenderer;
-import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Axis;
@@ -44,7 +37,8 @@ public class ShellEntityRenderer<T extends ShellEntity, M extends ShellEntityMod
         float o = 0.0F;
 
         this.model.setAngles(shell, o, n, shell.age, h, m);
-        RenderLayer renderLayer = RenderLayer.getEntitySolid(ShellEntityModel.IDENTIFIER);
+        RenderLayer renderLayer = RenderLayer.getEntitySolid(getTexture(shell));
+
         if (renderLayer != null) {
             VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(renderLayer);
             int p = OverlayTexture.getUv(0,false);
@@ -56,6 +50,6 @@ public class ShellEntityRenderer<T extends ShellEntity, M extends ShellEntityMod
 
     @Override
     public Identifier getTexture(T entity) {
-        return ShellEntityModel.IDENTIFIER;
+        return entity.isIncendiary() ? ShellEntityModel.NAPALM_SHELL_TEXTURE : entity.getColor() == -1 ? ShellEntityModel.SHELL_TEXTURE : ShellEntityModel.TIPPED_SHELL_TEXTURE;
     }
 }

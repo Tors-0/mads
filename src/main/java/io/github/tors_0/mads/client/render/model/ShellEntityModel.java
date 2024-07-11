@@ -13,8 +13,10 @@ import net.minecraft.util.Identifier;
 // Exported for Minecraft version 1.17+ for Yarn
 // Paste this class into your mod and generate all required imports
 public class ShellEntityModel<T extends ShellEntity> extends EntityModel<T> {
-	public static final Identifier IDENTIFIER = Mads.getId("textures/entity/shell.png");
-	public static final EntityModelLayer LAYER_LOCATION = new EntityModelLayer(IDENTIFIER, "main");
+	public static final Identifier SHELL_TEXTURE = Mads.getId("textures/entity/shell.png");
+	public static final Identifier NAPALM_SHELL_TEXTURE = Mads.getId("textures/entity/shell_napalm.png");
+	public static final Identifier TIPPED_SHELL_TEXTURE = Mads.getId("textures/entity/shell_tipped.png");
+	public static final EntityModelLayer LAYER_LOCATION = new EntityModelLayer(Mads.getId("shell"), "main");
 	private final ModelPart bone;
 
 	public ShellEntityModel(ModelPart root) {
@@ -24,7 +26,7 @@ public class ShellEntityModel<T extends ShellEntity> extends EntityModel<T> {
 	public static TexturedModelData getTexturedModelData() {
 		ModelData modelData = new ModelData();
 		ModelPartData modelPartData = modelData.getRoot();
-		ModelPartData bone = modelPartData.addChild("bone", ModelPartBuilder.create().uv(12, 0).cuboid(-2.0F, -6.0F, -2.0F, 4.0F, 8.0F, 4.0F, new Dilation(0.0F))
+		modelPartData.addChild("bone", ModelPartBuilder.create().uv(12, 0).cuboid(-2.0F, -6.0F, -2.0F, 4.0F, 8.0F, 4.0F, new Dilation(0.0F))
 				.uv(0, 0).cuboid(-1.5F, -10.0F, -1.5F, 3.0F, 13.0F, 3.0F, new Dilation(0.0F))
 				.uv(12, 12).cuboid(-1.0F, -12.0F, -1.0F, 2.0F, 2.0F, 2.0F, new Dilation(0.0F))
 				.uv(9, 0).cuboid(-0.5F, -13.0F, -0.5F, 1.0F, 1.0F, 1.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 21.0F, 0.0F));

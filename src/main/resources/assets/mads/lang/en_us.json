@@ -3,6 +3,7 @@
 
   "item.mads.empty_shell": "Empty Shell",
   "item.mads.shell": "High Explosive Shell",
+  "item.mads.napalm_shell": "Napalm Shell",
   "item.mads.fuze": "Fuze",
 
   "item.mads.tipped_shell": "Tipped Shell",
@@ -30,6 +31,8 @@
   "item.mads.tipped_shell.effect.weakness": "Shell of Weakness",
 
   "item.mads.armed_shell": "Armed High Explosive Shell",
+  "item.mads.armed_napalm_shell": "Armed Napalm Shell",
+
   "item.mads.armed_tipped_shell": "Armed Tipped Shell",
   "item.mads.armed_tipped_shell.effect.awkward": "Armed Tipped Shell",
   "item.mads.armed_tipped_shell.effect.empty": "Armed Uncraftable Tipped Shell",

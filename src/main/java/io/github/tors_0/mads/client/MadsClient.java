@@ -22,6 +22,7 @@ import org.quiltmc.loader.api.ModContainer;
 import org.quiltmc.loader.api.minecraft.ClientOnly;
 import org.quiltmc.qsl.base.api.entrypoint.client.ClientModInitializer;
 import org.quiltmc.qsl.networking.api.client.ClientPlayNetworking;
+import org.quiltmc.qsl.rendering.entity.api.client.ArmorRenderingRegistry;
 
 @ClientOnly
 public class MadsClient implements ClientModInitializer {

@@ -10,7 +10,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 import org.quiltmc.qsl.item.setting.api.QuiltItemSettings;
 
@@ -23,6 +22,8 @@ public interface ModItems {
     Item EMPTY_SHELL = createItem("empty_shell", new Item(new QuiltItemSettings()));
     Item SHELL = createItem("shell", new ShellItem(new QuiltItemSettings().maxCount(16), false));
     Item ARMED_SHELL = createItem("armed_shell", new ShellItem(new QuiltItemSettings().maxCount(16), true));
+    Item NAPALM_SHELL = createItem("napalm_shell", new ShellItem(new QuiltItemSettings().maxCount(16), false));
+    Item ARMED_NAPALM_SHELL = createItem("armed_napalm_shell", new ShellItem(new QuiltItemSettings().maxCount(16), true));
     Item TIPPED_SHELL = createItem("tipped_shell", new TippedShellItem(new QuiltItemSettings().maxCount(16), false));
     Item ARMED_TIPPED_SHELL = createItem("armed_tipped_shell", new TippedShellItem(new QuiltItemSettings().maxCount(16), true));
     Item FUZE = createItem("fuze", new Item(new QuiltItemSettings()));
@@ -41,8 +42,10 @@ public interface ModItems {
             entries.addItem(ModBlocks.MORTAR.asItem());
             entries.addItem(EMPTY_SHELL);
             entries.addItem(SHELL);
+            entries.addItem(NAPALM_SHELL);
             entries.addItem(FUZE);
             entries.addItem(ARMED_SHELL);
+            entries.addItem(ARMED_NAPALM_SHELL);
 
             Registries.POTION.forEach(potion -> entries.addStack(PotionUtil.setPotion(new ItemStack(ModItems.ARMED_TIPPED_SHELL), potion)));
         });
