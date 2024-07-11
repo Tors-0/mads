@@ -112,36 +112,6 @@ public class MortarGuiDescription extends SyncedGuiDescription {
         rotation.setAlignment(HorizontalAlignment.CENTER);
         root.add(rotation, 90, 28,72,20);
 
-        // angle buttons
-//        WButton angleUp = new WButton(Text.literal("↑"));
-//        angleUp.setOnClick(() -> {
-//            int ang = this.propertyDelegate.get(3);
-//            this.propertyDelegate.set(3, ang >= 85 ? 85 : ang + 1);
-//        });
-//        root.add(angleUp, 20,40, 15, 20);
-//
-//        WButton angleDown = new WButton(Text.literal("↓"));
-//        angleDown.setOnClick(() -> {
-//            int ang = this.propertyDelegate.get(3);
-//            this.propertyDelegate.set(3, ang <= 60 ? ang : ang - 1);
-//        });
-//        root.add(angleDown, 38,40, 15, 20);
-
-        // rotation buttons
-//        WButton rotLeft = new WButton(Text.literal("←"));
-//        rotLeft.setOnClick(() -> {
-//            int rot = this.propertyDelegate.get(2);
-//            this.propertyDelegate.set(2, rot - 10 < 0 ? 360 + rot - 10 : rot - 10);
-//        });
-//        root.add(rotLeft, 110,40, 15, 20);
-//
-//        WButton rotRight = new WButton(Text.literal("→"));
-//        rotRight.setOnClick(() -> {
-//            int rot = this.propertyDelegate.get(2);
-//            this.propertyDelegate.set(2, rot + 10 >= 360 ? 0 : rot + 10);
-//        });
-//        root.add(rotRight, 128,40, 15, 20);
-
         WButton setButton = new WButton(Text.literal("✔"));
         setButton.setOnClick(() -> {
             ScreenNetworking.of(this, NetworkSide.CLIENT).send(ROT_MESSAGE, buf -> buf.writeInt(this.propertyDelegate.get(2)));
@@ -152,10 +122,5 @@ public class MortarGuiDescription extends SyncedGuiDescription {
         root.add(this.createPlayerInventoryPanel(), 0, 80);
 
         root.validate(this);
-    }
-
-    @Override
-    public void close(PlayerEntity player) {
-        super.close(player);
     }
 }

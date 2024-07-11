@@ -1,6 +1,7 @@
 package io.github.tors_0.mads.registry;
 
 import io.github.tors_0.mads.Mads;
+import io.github.tors_0.mads.block.AmmoCrateBlock;
 import io.github.tors_0.mads.block.MortarBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -18,6 +19,7 @@ public interface ModBlocks {
     Map<Block, Identifier> BLOCKS = new LinkedHashMap<>();
 
     Block MORTAR = createBlock("mortar", new MortarBlock(QuiltBlockSettings.copyOf(Blocks.IRON_BLOCK)), true);
+    Block AMMO_CRATE = createBlock("ammo_crate", new AmmoCrateBlock(QuiltBlockSettings.copyOf(Blocks.COMPOSTER)), true);
 
     static void registerBlocks() {
         BLOCKS.keySet().forEach(block -> {

@@ -1,0 +1,4 @@
+{
+  "parent": "mads:block/ammo_crate",
+  "gui_light": "front"
+}

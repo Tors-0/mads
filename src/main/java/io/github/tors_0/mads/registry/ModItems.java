@@ -40,6 +40,7 @@ public interface ModItems {
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(entries -> {
             entries.addItem(ModBlocks.MORTAR.asItem());
+            entries.addItem(ModBlocks.AMMO_CRATE.asItem());
             entries.addItem(EMPTY_SHELL);
             entries.addItem(SHELL);
             entries.addItem(NAPALM_SHELL);

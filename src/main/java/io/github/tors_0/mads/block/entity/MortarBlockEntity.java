@@ -31,6 +31,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -56,10 +57,21 @@ public class MortarBlockEntity extends BlockEntity implements ImplementedInvento
     }
 
     private int progress = 0;
-    private int maxProgress = 72;
+    private int maxProgress = 20;
 
     public int getRotation() {
         return rotation;
+    }
+
+    @Override
+    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction side) {
+        boolean canI = true;
+        if (slot == 0 && !(stack.getItem() instanceof MortarProjectile proj && proj.isArmed())) {
+            canI = false;
+        } else if (slot == 1 && !(stack.isOf(Items.GUNPOWDER))) {
+            canI = false;
+        }
+        return ImplementedInventory.super.canInsert(slot, stack, side) && canI;
     }
 
     public int getAngle() {

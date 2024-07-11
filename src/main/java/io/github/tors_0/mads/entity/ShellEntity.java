@@ -81,7 +81,7 @@ public class ShellEntity extends PersistentProjectileEntity {
 
     protected void detonate() {
         if (this.dataTracker.get(COLOR) != -2) {
-            this.getWorld().createExplosion(this, this.getX(), this.getY(), this.getZ(), 2.3f, false, World.ExplosionSourceType.TNT);
+            this.getWorld().createExplosion(this, this.getDamageSources().explosion(this, this), new ExplosionBehavior(), this.getPos(), 2.3f, false, World.ExplosionSourceType.TNT);
         } else {
             IncendiaryExplosion napalm = new IncendiaryExplosion(getWorld(), this, this.getDamageSources().explosion(this, this),
                     new IncendiaryExplosionBehavior(), this.getX(), this.getY(), this.getZ(), 4f);
@@ -295,7 +295,7 @@ public class ShellEntity extends PersistentProjectileEntity {
     protected void onEntityHit(EntityHitResult entityHitResult) {
         Entity entity = entityHitResult.getEntity();
         if (entity instanceof LivingEntity && !(entity instanceof EndermanEntity)) {
-            entity.damage(this.getDamageSources().mobProjectile(this, null), 10f);
+            entity.damage(this.getDamageSources().thrown(this, this), 10f);
             entity.addVelocity(this.getVelocity());
             entity.velocityDirty = true;
 

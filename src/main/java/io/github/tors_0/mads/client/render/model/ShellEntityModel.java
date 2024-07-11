@@ -8,6 +8,7 @@ import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 
 // Made with Blockbench 4.10.0
 // Exported for Minecraft version 1.17+ for Yarn
@@ -34,7 +35,7 @@ public class ShellEntityModel<T extends ShellEntity> extends EntityModel<T> {
 	}
 
 	@Override
-	public void setAngles(ShellEntity entity, float limbSwing, float limbSwingAmount,
+	public void setAngles(@Nullable ShellEntity entity, float limbSwing, float limbSwingAmount,
 						  float ageInTicks, float netHeadYaw, float headPitch) {
 		bone.yaw=0;
 		bone.pitch=0;

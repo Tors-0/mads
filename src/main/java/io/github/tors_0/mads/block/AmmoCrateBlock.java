@@ -1,7 +1,8 @@
 package io.github.tors_0.mads.block;
 
-import io.github.tors_0.mads.registry.ModBlockEntities;
+import io.github.tors_0.mads.block.entity.AmmoCrateBlockEntity;
 import io.github.tors_0.mads.block.entity.MortarBlockEntity;
+import io.github.tors_0.mads.registry.ModBlockEntities;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -18,10 +19,10 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class MortarBlock extends BlockWithEntity implements BlockEntityProvider {
-    private static final VoxelShape SHAPE = MortarBlock.createCuboidShape(0,0,0,16,15,16);
+public class AmmoCrateBlock extends BlockWithEntity implements BlockEntityProvider {
+    private static final VoxelShape SHAPE = AmmoCrateBlock.createCuboidShape(0,0,0,16,14,16);
 
-    public MortarBlock(Settings settings) {
+    public AmmoCrateBlock(Settings settings) {
         super(settings);
     }
 
@@ -32,21 +33,21 @@ public class MortarBlock extends BlockWithEntity implements BlockEntityProvider 
 
     @Override
     public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.INVISIBLE;
+        return BlockRenderType.MODEL;
     }
 
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new MortarBlockEntity(pos, state);
+        return new AmmoCrateBlockEntity(pos, state);
     }
 
     @Override
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         if (state.getBlock() != newState.getBlock()) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
-            if (blockEntity instanceof MortarBlockEntity) {
-                ItemScatterer.spawn(world, pos, (MortarBlockEntity)blockEntity);
+            if (blockEntity instanceof AmmoCrateBlockEntity) {
+                ItemScatterer.spawn(world, pos, (AmmoCrateBlockEntity)blockEntity);
                 world.updateComparators(pos,this);
             }
             super.onStateReplaced(state, world, pos, newState, moved);
@@ -56,7 +57,7 @@ public class MortarBlock extends BlockWithEntity implements BlockEntityProvider 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (!world.isClient) {
-            NamedScreenHandlerFactory screenHandlerFactory = ((MortarBlockEntity) world.getBlockEntity(pos));
+            NamedScreenHandlerFactory screenHandlerFactory = ((AmmoCrateBlockEntity) world.getBlockEntity(pos));
 
             if (screenHandlerFactory != null) {
                 player.openHandledScreen(screenHandlerFactory);
@@ -69,7 +70,7 @@ public class MortarBlock extends BlockWithEntity implements BlockEntityProvider 
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return checkType(type, ModBlockEntities.MORTAR_BLOCK_ENTITY,
+        return checkType(type, ModBlockEntities.AMMO_CRATE_BLOCK_ENTITY,
                 ((world1, blockPos, blockState, blockEntity) -> blockEntity.tick(world1, blockPos, blockState)));
     }
 }
