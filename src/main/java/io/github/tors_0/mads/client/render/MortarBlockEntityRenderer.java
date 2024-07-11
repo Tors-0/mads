@@ -3,7 +3,6 @@ package io.github.tors_0.mads.client.render;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.tors_0.mads.block.entity.MortarBlockEntity;
 import io.github.tors_0.mads.client.render.model.MortarBlockEntityModel;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;

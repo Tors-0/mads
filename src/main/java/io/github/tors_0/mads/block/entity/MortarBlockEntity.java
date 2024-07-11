@@ -194,7 +194,7 @@ public class MortarBlockEntity extends BlockEntity implements ImplementedInvento
     private void launch() {
 
         Vec3d velocity = getVectorForRotation(angle, clampYaw(rotation)).multiply(-1);
-        Vec3d pos = this.pos.ofCenter().add(velocity.normalize().multiply(1.5));
+        Vec3d pos = this.pos.ofCenter().add(velocity.normalize().multiply(2.5));
 
         ItemStack itemStack = this.getStack(0);
         ShellItem shellItem = (ShellItem) (itemStack.getItem() instanceof ShellItem ? itemStack.getItem() : ModItems.SHELL);

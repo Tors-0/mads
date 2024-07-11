@@ -49,7 +49,8 @@ public class MortarBlockEntityModel<T extends MortarBlockEntity> extends Model {
         ModelPartData mortar = assembly.addChild("mortar", ModelPartBuilder.create(), ModelTransform.of(0f, -5.5f, 0f,0,0,0));
 
         mortar.addChild("barrel", ModelPartBuilder.create()
-                        .uv(0, 33).cuboid(-4.0F, -21.0F, -4.0F, 8.0F, 24.0F, 8.0F),
+                        .uv(1, 65).cuboid(-3.0F, -36.0F, -3.0F, 6.0F, 16.0F, 6.0F, new Dilation(0.0F))
+                        .uv(0, 33).cuboid(-4.0F, -21.0F, -4.0F, 8.0F, 24.0F, 8.0F, new Dilation(0.0F)),
                 ModelTransform.of(0.0F, 0.0F, 0.0F,0,0,0));
 
         ModelPartData bone = modelPartData.addChild("bone", ModelPartBuilder.create().uv(0, 0)
