@@ -3,8 +3,10 @@
   "block.mads.ammo_crate": "Ammo Crate",
 
   "item.mads.empty_shell": "Empty Shell",
-  "item.mads.shell": "High Explosive Shell",
+  "item.mads.shell": "Explosive Shell",
   "item.mads.napalm_shell": "Napalm Shell",
+  "item.mads.high_yield_shell": "High Yield Explosive Shell",
+  "item.mads.nuke_shell": "Mini Nuke Shell",
   "item.mads.fuze": "Fuze",
   "item.mads.ammo_crate": "Ammo Crate",
 
@@ -32,8 +34,10 @@
   "item.mads.tipped_shell.effect.water_breathing": "Shell of Water Breathing",
   "item.mads.tipped_shell.effect.weakness": "Shell of Weakness",
 
-  "item.mads.armed_shell": "Armed High Explosive Shell",
+  "item.mads.armed_shell": "Armed Explosive Shell",
   "item.mads.armed_napalm_shell": "Armed Napalm Shell",
+  "item.mads.armed_high_yield_shell": "Armed High Yield Explosive Shell",
+  "item.mads.armed_nuke_shell": "Armed Mini Nuke Shell",
 
   "item.mads.armed_tipped_shell": "Armed Tipped Shell",
   "item.mads.armed_tipped_shell.effect.awkward": "Armed Tipped Shell",

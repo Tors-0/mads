@@ -20,7 +20,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class AmmoCrateBlock extends BlockWithEntity implements BlockEntityProvider {
-    private static final VoxelShape SHAPE = AmmoCrateBlock.createCuboidShape(0,0,0,16,14,16);
+    private static final VoxelShape SHAPE = AmmoCrateBlock.createCuboidShape(0,0,0,16,19,16);
 
     public AmmoCrateBlock(Settings settings) {
         super(settings);

@@ -24,6 +24,10 @@ public interface ModItems {
     Item ARMED_SHELL = createItem("armed_shell", new ShellItem(new QuiltItemSettings().maxCount(16), true));
     Item NAPALM_SHELL = createItem("napalm_shell", new ShellItem(new QuiltItemSettings().maxCount(16), false));
     Item ARMED_NAPALM_SHELL = createItem("armed_napalm_shell", new ShellItem(new QuiltItemSettings().maxCount(16), true));
+    Item HIGH_YIELD_SHELL = createItem("high_yield_shell", new ShellItem(new QuiltItemSettings().maxCount(16), false));
+    Item ARMED_HIGH_YIELD_SHELL = createItem("armed_high_yield_shell", new ShellItem(new QuiltItemSettings().maxCount(16), true));
+    Item NUKE_SHELL = createItem("nuke_shell", new ShellItem(new QuiltItemSettings().maxCount(16), false));
+    Item ARMED_NUKE_SHELL = createItem("armed_nuke_shell", new ShellItem(new QuiltItemSettings().maxCount(16), true));
     Item TIPPED_SHELL = createItem("tipped_shell", new TippedShellItem(new QuiltItemSettings().maxCount(16), false));
     Item ARMED_TIPPED_SHELL = createItem("armed_tipped_shell", new TippedShellItem(new QuiltItemSettings().maxCount(16), true));
     Item FUZE = createItem("fuze", new Item(new QuiltItemSettings()));
@@ -44,9 +48,13 @@ public interface ModItems {
             entries.addItem(EMPTY_SHELL);
             entries.addItem(SHELL);
             entries.addItem(NAPALM_SHELL);
+            entries.addItem(HIGH_YIELD_SHELL);
+            entries.addItem(NUKE_SHELL);
             entries.addItem(FUZE);
             entries.addItem(ARMED_SHELL);
             entries.addItem(ARMED_NAPALM_SHELL);
+            entries.addItem(ARMED_HIGH_YIELD_SHELL);
+            entries.addItem(ARMED_NUKE_SHELL);
 
             Registries.POTION.forEach(potion -> entries.addStack(PotionUtil.setPotion(new ItemStack(ModItems.ARMED_TIPPED_SHELL), potion)));
         });

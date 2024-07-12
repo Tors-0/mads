@@ -18,8 +18,8 @@ import java.util.Map;
 public interface ModBlocks {
     Map<Block, Identifier> BLOCKS = new LinkedHashMap<>();
 
-    Block MORTAR = createBlock("mortar", new MortarBlock(QuiltBlockSettings.copyOf(Blocks.IRON_BLOCK)), true);
-    Block AMMO_CRATE = createBlock("ammo_crate", new AmmoCrateBlock(QuiltBlockSettings.copyOf(Blocks.COMPOSTER)), true);
+    Block MORTAR = createBlock("mortar", new MortarBlock(QuiltBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque()), true);
+    Block AMMO_CRATE = createBlock("ammo_crate", new AmmoCrateBlock(QuiltBlockSettings.copyOf(Blocks.COMPOSTER).nonOpaque()), true);
 
     static void registerBlocks() {
         BLOCKS.keySet().forEach(block -> {

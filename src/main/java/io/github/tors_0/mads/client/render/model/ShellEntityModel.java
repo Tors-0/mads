@@ -17,6 +17,8 @@ public class ShellEntityModel<T extends ShellEntity> extends EntityModel<T> {
 	public static final Identifier SHELL_TEXTURE = Mads.getId("textures/entity/shell.png");
 	public static final Identifier NAPALM_SHELL_TEXTURE = Mads.getId("textures/entity/shell_napalm.png");
 	public static final Identifier TIPPED_SHELL_TEXTURE = Mads.getId("textures/entity/shell_tipped.png");
+	public static final Identifier HIGH_YIELD_SHELL_TEXTURE = Mads.getId("textures/entity/shell_high_yield.png");
+	public static final Identifier NUKE_SHELL_TEXTURE = Mads.getId("textures/entity/shell_nuclear.png");
 	public static final EntityModelLayer LAYER_LOCATION = new EntityModelLayer(Mads.getId("shell"), "main");
 	private final ModelPart bone;
 

@@ -200,7 +200,7 @@ public class MortarBlockEntity extends BlockEntity implements ImplementedInvento
         ShellItem shellItem = (ShellItem) (itemStack.getItem() instanceof ShellItem ? itemStack.getItem() : ModItems.SHELL);
         ShellEntity shell = shellItem.createShell(getWorld(), itemStack, pos);
 
-        shell.setVelocity(velocity.getX(), velocity.getY(), velocity.getZ(), 2.5f, 0.1f);
+        shell.setVelocity(velocity.getX(), velocity.getY(), velocity.getZ(), 2.5f, 2.5f);
         world.spawnEntity(shell);
         ((ServerWorld) world).spawnParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, pos.getX(), pos.getY(), pos.getZ(), 3, 0,0,0, 0.005);
         world.playSound(null, this.pos, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 7f, 5f);

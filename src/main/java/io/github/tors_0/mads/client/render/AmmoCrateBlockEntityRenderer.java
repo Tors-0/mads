@@ -58,6 +58,10 @@ public class AmmoCrateBlockEntityRenderer<T extends AmmoCrateBlockEntity, M exte
     }
 
     public Identifier getTexture(ItemStack stack) {
-        return stack.isOf(ModItems.ARMED_NAPALM_SHELL) ? ShellEntityModel.NAPALM_SHELL_TEXTURE : stack.isOf(ModItems.ARMED_SHELL) ? ShellEntityModel.SHELL_TEXTURE : ShellEntityModel.TIPPED_SHELL_TEXTURE;
+        return stack.isOf(ModItems.ARMED_SHELL) ? ShellEntityModel.SHELL_TEXTURE :
+                stack.isOf(ModItems.ARMED_NAPALM_SHELL) ? ShellEntityModel.NAPALM_SHELL_TEXTURE :
+                        stack.isOf(ModItems.ARMED_TIPPED_SHELL) ? ShellEntityModel.TIPPED_SHELL_TEXTURE :
+                                stack.isOf(ModItems.ARMED_HIGH_YIELD_SHELL) ? ShellEntityModel.HIGH_YIELD_SHELL_TEXTURE :
+                                        ShellEntityModel.NUKE_SHELL_TEXTURE;
     }
 }

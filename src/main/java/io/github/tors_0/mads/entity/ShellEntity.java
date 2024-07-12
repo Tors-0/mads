@@ -1,7 +1,6 @@
 package io.github.tors_0.mads.entity;
 
 import com.google.common.collect.Sets;
-import io.github.tors_0.mads.Mads;
 import io.github.tors_0.mads.misc.IncendiaryExplosion;
 import io.github.tors_0.mads.misc.IncendiaryExplosionBehavior;
 import io.github.tors_0.mads.registry.ModEntities;
@@ -38,6 +37,13 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 import net.minecraft.world.explosion.ExplosionBehavior;
+import team.lodestar.lodestone.handlers.ScreenshakeHandler;
+import team.lodestar.lodestone.handlers.screenparticle.ParticleEmitterHandler;
+import team.lodestar.lodestone.systems.rendering.particle.Easing;
+import team.lodestar.lodestone.systems.rendering.particle.WorldParticleBuilder;
+import team.lodestar.lodestone.systems.rendering.particle.world.WorldParticleEffect;
+import team.lodestar.lodestone.systems.screenshake.PositionedScreenshakeInstance;
+import team.lodestar.lodestone.systems.screenshake.ScreenshakeInstance;
 
 import java.util.Collection;
 import java.util.Set;
@@ -50,6 +56,8 @@ public class ShellEntity extends PersistentProjectileEntity {
     private Potion potion = Potions.EMPTY;
     private final Set<StatusEffectInstance> effects = Sets.<StatusEffectInstance>newHashSet();
     private boolean colorSet;
+
+    public ScreenshakeInstance detonationScreenShake;
 
     public boolean isIncendiary() {
         return incendiary || this.dataTracker.get(COLOR) == -2;
@@ -99,23 +107,39 @@ public class ShellEntity extends PersistentProjectileEntity {
     }
 
     protected void detonate() {
-        if (this.dataTracker.get(COLOR) == -1) {
-            this.getWorld().createExplosion(this, this.getDamageSources().explosion(this, this), new ExplosionBehavior(), this.getPos(), 2.3f, false, World.ExplosionSourceType.TNT);
-        } else if (this.dataTracker.get(COLOR) == -2) {
-            IncendiaryExplosion napalm = new IncendiaryExplosion(getWorld(), this, this.getDamageSources().explosion(this, this),
-                    new IncendiaryExplosionBehavior(), this.getX(), this.getY(), this.getZ(), 4f);
-            napalm.collectBlocksAndDamageEntities();
-
-            for (BlockPos blockPos3 : napalm.getAffectedBlocks()) {
-                if (!this.getWorld().getBlockState(blockPos3).isSolid()
-                        && this.getWorld().getBlockState(blockPos3.down()).isOpaqueFullCube(this.getWorld(), blockPos3.down())) {
-                    this.getWorld().setBlockState(blockPos3, AbstractFireBlock.getState(this.getWorld(), blockPos3));
-                }
+        switch (this.dataTracker.get(COLOR)) {
+            case -1 -> {
+                this.getWorld().createExplosion(this, this.getDamageSources().explosion(this, this), new ExplosionBehavior(), this.getPos(), 2.3f, false, World.ExplosionSourceType.TNT);
+                detonationScreenShake = new PositionedScreenshakeInstance(35, this.getPos(), 30f, 0f, 45f, Easing.CIRC_IN_OUT).setIntensity(0.3f, 0.5f, 0f);
+                ScreenshakeHandler.addScreenshake(detonationScreenShake);
             }
+            case -2 -> {
+                IncendiaryExplosion napalm = new IncendiaryExplosion(getWorld(), this, this.getDamageSources().explosion(this, this),
+                        new IncendiaryExplosionBehavior(), this.getX(), this.getY(), this.getZ(), 4f);
+                napalm.collectBlocksAndDamageEntities();
 
-            napalm.affectWorld(getWorld().isClient);
+                for (BlockPos blockPos3 : napalm.getAffectedBlocks()) {
+                    if (!this.getWorld().getBlockState(blockPos3).isSolid()
+                            && this.getWorld().getBlockState(blockPos3.down()).isOpaqueFullCube(this.getWorld(), blockPos3.down())) {
+                        this.getWorld().setBlockState(blockPos3, AbstractFireBlock.getState(this.getWorld(), blockPos3));
+                    }
+                }
+
+                napalm.affectWorld(getWorld().isClient);
+            }
+            case -3 -> {
+                this.getWorld().createExplosion(this, this.getDamageSources().explosion(this, this), new ExplosionBehavior(), this.getPos(), 5f, false, World.ExplosionSourceType.BLOCK);
+                detonationScreenShake = new PositionedScreenshakeInstance(45, this.getPos(), 50f, 0f, 80f, Easing.CIRC_IN_OUT).setIntensity(0.4f, 0.7f, 0f);
+                ScreenshakeHandler.addScreenshake(detonationScreenShake);
+            }
+            case -4 -> {
+                this.getWorld().createExplosion(this, this.getDamageSources().explosion(this, this), new ExplosionBehavior(), this.getPos(), 29.5f, false, World.ExplosionSourceType.BLOCK);
+                detonationScreenShake = new PositionedScreenshakeInstance(70, this.getPos(), 60f, 0f, 150f, Easing.CIRC_IN_OUT).setIntensity(1f, 5f, 0f);
+                ScreenshakeHandler.addScreenshake(detonationScreenShake);
+            }
         }
         this.discard();
+
     }
 
     @Override
@@ -158,6 +182,14 @@ public class ShellEntity extends PersistentProjectileEntity {
             this.potion = Potions.EMPTY;
             this.effects.clear();
             this.dataTracker.set(COLOR, -2);
+        } else if (stack.isOf(ModItems.ARMED_HIGH_YIELD_SHELL)) {
+            this.potion = Potions.EMPTY;
+            this.effects.clear();
+            this.dataTracker.set(COLOR, -3);
+        } else if (stack.isOf(ModItems.ARMED_NUKE_SHELL)) {
+            this.potion = Potions.EMPTY;
+            this.effects.clear();
+            this.dataTracker.set(COLOR, -4);
         }
     }
 
@@ -188,13 +220,12 @@ public class ShellEntity extends PersistentProjectileEntity {
 
     @Override
     protected boolean tryPickup(PlayerEntity player) {
-        this.detonate();
-        return false;
+        return true;
     }
 
     private void spawnParticles(int amount) {
         int i = this.getColor();
-        if (i != -1 && i != -2 && amount > 0) {
+        if (i >= 0 && amount > 0) {
             double d = (double)(i >> 16 & 0xFF) / 255.0;
             double e = (double)(i >> 8 & 0xFF) / 255.0;
             double f = (double)(i >> 0 & 0xFF) / 255.0;

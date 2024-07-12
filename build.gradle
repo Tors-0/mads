@@ -1,6 +1,7 @@
 plugins {
 	id 'maven-publish'
 	alias libs.plugins.quilt.loom
+	alias libs.plugins.chenille
 }
 
 base {
@@ -20,6 +21,34 @@ repositories {
 	maven {
 		name = "CottonMC"
 		url = "https://server.bbkr.space/artifactory/libs-release"
+	}
+	maven {
+		name = "BlameJared maven"
+		url = uri("https://maven.blamejared.com/")
+	}
+	maven {
+		name = "Curios maven"
+		url = uri("https://maven.theillusivec4.top/")
+	}
+	maven {
+		name = "JamiesWhiteShirt"
+		url = uri("https://maven.jamieswhiteshirt.com/libs-release")
+	}
+	maven {
+		name = "Ladysnake maven"
+		url = uri("https://maven.ladysnake.org/releases")
+	}
+	maven { url = "https://mvn.devos.one/releases/" }
+	maven { // modmenu
+		name = "TerraformersMC"
+		url = "https://maven.terraformersmc.com/"
+	}
+	maven { // iris & sodium
+		name "modrinth"
+		url "https://api.modrinth.com/maven"
+		content {
+			includeGroup('maven.modrinth')
+		}
 	}
 }
 
@@ -58,12 +87,31 @@ dependencies {
 
 	modImplementation include("io.github.cottonmc:LibGui:${libs.versions.libgui.get()}")
 
-//	include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.3.6")))
+//	modImplementation("team.lodestar.lodestone:lodestone:${libs.versions.minecraft.get()}-${libs.versions.lodestone.get()}-fabric")
 
 // QSL is not a complete API; You will need Quilted Fabric API to fill in the gaps.
 	// Quilted Fabric API will automatically pull in the correct QSL version.
-	modImplementation libs.quilted.fabric.api
-	// modImplementation libs.bundles.quilted.fabric.api // If you wish to use Fabric API's deprecated modules, you can replace the above line with this one
+//	modImplementation libs.quilted.fabric.api
+	modImplementation libs.bundles.quilted.fabric.api // If you wish to use Fabric API's deprecated modules, you can replace the above line with this one// mod menu
+
+	modLocalImplementation(libs.modmenu) {
+		transitive = false
+	}
+
+	modImplementation(libs.midnightLib)
+	include(libs.midnightLib)
+
+	// lodestone lib
+	modImplementation(libs.lodestoneLib) {
+		transitive = false
+	}
+	include(libs.lodestoneLib)
+
+	// iris and sodium
+	modLocalImplementation(libs.sodium)
+	modLocalImplementation(libs.iris)
+	runtimeOnly(libs.jcpp)
+	implementation(libs.glslTransformer)
 }
 
 processResources {

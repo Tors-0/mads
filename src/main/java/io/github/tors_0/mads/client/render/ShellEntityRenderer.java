@@ -50,6 +50,12 @@ public class ShellEntityRenderer<T extends ShellEntity, M extends ShellEntityMod
 
     @Override
     public Identifier getTexture(T entity) {
-        return entity.isIncendiary() ? ShellEntityModel.NAPALM_SHELL_TEXTURE : entity.getColor() == -1 ? ShellEntityModel.SHELL_TEXTURE : ShellEntityModel.TIPPED_SHELL_TEXTURE;
+        return switch (entity.getColor()) {
+            case -1 -> ShellEntityModel.SHELL_TEXTURE;
+            case -2 -> ShellEntityModel.NAPALM_SHELL_TEXTURE;
+            case -3 -> ShellEntityModel.HIGH_YIELD_SHELL_TEXTURE;
+            case -4 -> ShellEntityModel.NUKE_SHELL_TEXTURE;
+            default -> ShellEntityModel.TIPPED_SHELL_TEXTURE;
+        };
     }
 }

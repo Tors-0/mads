@@ -13,6 +13,7 @@ import io.github.cottonmc.cotton.gui.widget.icon.Icon;
 import io.github.cottonmc.cotton.gui.widget.icon.ItemIcon;
 import io.github.cottonmc.cotton.gui.widget.icon.TextureIcon;
 import io.github.tors_0.mads.Mads;
+import io.github.tors_0.mads.item.MortarProjectile;
 import io.github.tors_0.mads.registry.ModBlockEntities;
 import io.github.tors_0.mads.registry.ModItems;
 import io.github.tors_0.mads.screen.ModScreenHandlers;
@@ -76,6 +77,7 @@ public class MortarGuiDescription extends SyncedGuiDescription {
         root.setInsets(Insets.ROOT_PANEL);
 
         WItemSlot itemSlot = WItemSlot.of(blockInventory, 0);
+        itemSlot.setInputFilter(itemStack -> itemStack.getItem() instanceof MortarProjectile proj && proj.isArmed());
         itemSlot.setIcon(SHELL_ICON);
         root.add(itemSlot, 72, 20);
 
