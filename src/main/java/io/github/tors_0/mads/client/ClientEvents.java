@@ -9,8 +9,8 @@ import team.lodestar.lodestone.systems.particle.screen.ScreenParticleHolder;
 public class ClientEvents implements ParticleEmitterHandler.ItemParticleSupplier {
     public static final ScreenParticleHolder PARTICLES = new ScreenParticleHolder();
 
-    @Override
-    public void spawnLateParticles(ScreenParticleHolder target, World level, float partialTick, ItemStack stack, float x, float y) {
-        target.addFrom(PARTICLES);
-    }
+//    @Override
+//    public void spawnLateParticles(ScreenParticleHolder target, World level, float partialTick, ItemStack stack, float x, float y) {
+//        target.addFrom(PARTICLES);
+//    }
 }
