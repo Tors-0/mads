@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "blocks",
+  "pattern": [
+    "sss",
+    "sDs",
+    "ppp"
+  ],
+  "key": {
+    "s": {
+      "item": "minecraft:stick"
+    },
+    "p": {
+      "tag": "minecraft:planks"
+    },
+    "D": {
+      "item": "minecraft:chest"
+    }
+  },
+  "result": {
+    "item": "mads:ammo_crate"
+  }
+}
