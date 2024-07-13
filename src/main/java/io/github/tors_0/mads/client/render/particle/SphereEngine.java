@@ -1,15 +1,11 @@
 package io.github.tors_0.mads.client.render.particle;
 
-import io.github.fabricators_of_create.porting_lib.event.client.RenderPlayerEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.scoreboard.ScoreboardCriterion;
 import net.minecraft.util.math.Vec3d;
 import org.quiltmc.loader.api.minecraft.ClientOnly;
-import team.lodestar.lodestone.handlers.RenderHandler;
-import team.lodestar.lodestone.systems.particle.render_types.LodestoneWorldParticleRenderType;
 import team.lodestar.lodestone.systems.rendering.VFXBuilders;
 
 import java.awt.*;
@@ -26,12 +22,11 @@ public class SphereEngine {
     private static float previousTick;
     private static List<Sphere> scheduledForRemoval;
 
-    public static void RenderSpheres(PlayerEntity player, float partialTick, MatrixStack stack) {
+    public static void RenderSpheres(WorldRenderContext context) {
         if (spheres == null) spheres = new ArrayList<>();
         if (scheduledForRemoval == null) scheduledForRemoval = new ArrayList<>();
 
-        float deltaTick = (player.getWorld().getTime() + partialTick) - previousTick;
-        previousTick = (player.getWorld().getTime() + partialTick);
+        float deltaTick = context.tickDelta();
 
         sortSpheres();
         for (Sphere sphere : spheres) {
@@ -39,7 +34,7 @@ public class SphereEngine {
                 markForRemoval(sphere);
                 continue;
             }
-            sphere.render(player, stack, deltaTick, sphere);
+            sphere.render(context.camera(), context.matrixStack(), deltaTick, sphere);
         }
         emptySchedule();
     }
@@ -96,15 +91,15 @@ public class SphereEngine {
         }
 
 
-        public void render(PlayerEntity player, MatrixStack stack, float deltaTick, Sphere sphere) {
-            latestCameraPos = player.getCameraPosVec(deltaTick);
+        public void render(Camera camera, MatrixStack stack, float deltaTick, Sphere sphere) {
+            latestCameraPos = camera.getPos();
             Vec3d cameraPos = latestCameraPos;
             Vec3d spherePos = this.pos;
             float radius = this.radius;
             RenderLayer type = this.type;
             stack.push();
             stack.translate(spherePos.x - cameraPos.x, spherePos.y - cameraPos.y, spherePos.z - cameraPos.z);
-            VFXBuilders.WorldVFXBuilder builder = VFXBuilders.createWorld();
+            VFXBuilders.WorldVFXBuilder builder = VFXBuilders.createWorld().setRenderType(type);
             if (this.color != null)
                 builder.setColor(this.color);
             builder.setAlpha(this.opacity).renderSphere(stack, radius, 20, 20);
