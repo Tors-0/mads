@@ -89,9 +89,6 @@ public class MadsClient implements ClientModInitializer {
             });
         }));
 
-        RenderPlayerEvents.PRE.register(((player, renderer, partialTick, matrixStack, buffer, packedLight) -> {
-            SphereEngine.RenderSpheres(player, partialTick, matrixStack);
-            return false;
-        }));
+        WorldRenderEvents.AFTER_ENTITIES.register((SphereEngine::RenderSpheres));
     }
 }
