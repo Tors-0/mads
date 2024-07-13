@@ -1,7 +1,15 @@
 package io.github.tors_0.mads.client.render.particle;
 
+import io.github.fabricators_of_create.porting_lib.event.client.RenderPlayerEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.scoreboard.ScoreboardCriterion;
+import net.minecraft.util.math.Vec3d;
 import org.quiltmc.loader.api.minecraft.ClientOnly;
 import team.lodestar.lodestone.handlers.RenderHandler;
+import team.lodestar.lodestone.systems.particle.render_types.LodestoneWorldParticleRenderType;
 import team.lodestar.lodestone.systems.rendering.VFXBuilders;
 
 import java.awt.*;
@@ -13,18 +21,17 @@ import java.util.List;
 @ClientOnly
 public class SphereEngine {
 
-    public static Vec3 latestCameraPos;
+    public static Vec3d latestCameraPos;
     private static List<Sphere> spheres;
     private static float previousTick;
     private static List<Sphere> scheduledForRemoval;
 
-    public static void RenderSpheres(RenderLevelStageEvent event) {
+    public static void RenderSpheres(PlayerEntity player, float partialTick, MatrixStack stack) {
         if (spheres == null) spheres = new ArrayList<>();
         if (scheduledForRemoval == null) scheduledForRemoval = new ArrayList<>();
 
-
-        float deltaTick = (event.getRenderTick() + event.getPartialTick()) - previousTick;
-        previousTick = (event.getRenderTick() + event.getPartialTick());
+        float deltaTick = (player.getWorld().getTime() + partialTick) - previousTick;
+        previousTick = (player.getWorld().getTime() + partialTick);
 
         sortSpheres();
         for (Sphere sphere : spheres) {
@@ -32,7 +39,7 @@ public class SphereEngine {
                 markForRemoval(sphere);
                 continue;
             }
-            sphere.render(event, sphere);
+            sphere.render(player, stack, deltaTick, sphere);
         }
         emptySchedule();
     }
@@ -68,14 +75,14 @@ public class SphereEngine {
 
 
     public static class Sphere {
-        public RenderType type;
-        public Vec3 pos;
+        public RenderLayer type;
+        public Vec3d pos;
         public float radius;
         public float opacity;
         public boolean isValid;
         public Color color;
 
-        public Sphere(RenderType type, Vec3 pos, float radius, float opacity, Color color) {
+        public Sphere(RenderLayer type, Vec3d pos, float radius, float opacity, Color color) {
             this.type = type;
             this.pos = pos;
             this.radius = radius;
@@ -89,20 +96,19 @@ public class SphereEngine {
         }
 
 
-        public void render(RenderLevelStageEvent event, Sphere sphere) {
-            latestCameraPos = event.getCamera().getPosition();
-            Vec3 cameraPos = latestCameraPos;
-            PoseStack stack = event.getPoseStack();
-            Vec3 spherePos = this.pos;
+        public void render(PlayerEntity player, MatrixStack stack, float deltaTick, Sphere sphere) {
+            latestCameraPos = player.getCameraPosVec(deltaTick);
+            Vec3d cameraPos = latestCameraPos;
+            Vec3d spherePos = this.pos;
             float radius = this.radius;
-            RenderType type = this.type;
-            stack.pushPose();
+            RenderLayer type = this.type;
+            stack.push();
             stack.translate(spherePos.x - cameraPos.x, spherePos.y - cameraPos.y, spherePos.z - cameraPos.z);
-            VFXBuilders.WorldVFXBuilder builder = VFXBuilders.createWorld().setPosColorTexLightmapDefaultFormat();
+            VFXBuilders.WorldVFXBuilder builder = VFXBuilders.createWorld();
             if (this.color != null)
                 builder.setColor(this.color);
-            builder.setAlpha(this.opacity).renderSphere(RenderHandler.DELAYED_RENDER.getBuffer(type), stack, radius, 20, 20);
-            stack.popPose();
+            builder.setAlpha(this.opacity).renderSphere(stack, radius, 20, 20);
+            stack.pop();
         }
 
     }
@@ -111,7 +117,7 @@ public class SphereEngine {
         public int maxTime;
         public float lifeTime = 0;
 
-        public TimerSphere(RenderType type, Vec3 pos, float radius, int maxTime, float opacity,Color color) {
+        public TimerSphere(RenderLayer type, Vec3d pos, float radius, int maxTime, float opacity,Color color) {
             super(type, pos, radius, opacity,color);
             this.maxTime = maxTime;
         }
@@ -128,8 +134,8 @@ public class SphereEngine {
         public float minRadius;
         public float maxRadius;
 
-        public TimerGrowingSphere(RenderType type, Vec3 pos, float minRadius, float maxRadius, int maxTime, float opacity,Color color) {
-            super(type, pos, minRadius, maxTime, opacity,color);
+        public TimerGrowingSphere(RenderLayer type, Vec3d pos, float minRadius, float maxRadius, int maxTime, float opacity, Color color) {
+            super(type, pos, minRadius, maxTime, opacity, color);
             this.minRadius = minRadius;
             this.maxRadius = maxRadius;
         }
@@ -144,13 +150,13 @@ public class SphereEngine {
     }
 
     public static class OrbitalSphere extends Sphere {
-        public Vec3 orbitCentre;
+        public Vec3d orbitCentre;
         public float orbitRadius;
         public int fullOrbitTime;
         public float lifeTime = 0;
 
 
-        public OrbitalSphere(RenderType type, Vec3 orbitCentre, float sphereRadius, float orbitRadius, int fullOrbitTime, float opacity,Color color) {
+        public OrbitalSphere(RenderLayer type, Vec3d orbitCentre, float sphereRadius, float orbitRadius, int fullOrbitTime, float opacity,Color color) {
             super(type, orbitCentre.add(orbitRadius, 0, 0), sphereRadius, opacity,color);
             this.orbitCentre = orbitCentre;
             this.orbitRadius = orbitRadius;

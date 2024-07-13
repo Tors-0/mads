@@ -1,7 +1,12 @@
 package io.github.tors_0.mads.client.render.particle;
 
 import com.mojang.blaze3d.vertex.VertexFormat;
+import io.github.tors_0.mads.Mads;
+import io.github.tors_0.mads.client.ClientEvents;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import team.lodestar.lodestone.registry.client.LodestoneRenderTypeRegistry;
 import team.lodestar.lodestone.registry.common.particle.LodestoneParticleRegistry;
 import team.lodestar.lodestone.registry.common.particle.LodestoneScreenParticleRegistry;
@@ -13,15 +18,15 @@ import team.lodestar.lodestone.systems.particle.data.GenericParticleData;
 import team.lodestar.lodestone.systems.particle.data.color.ColorParticleData;
 import team.lodestar.lodestone.systems.particle.data.spin.SpinParticleData;
 import team.lodestar.lodestone.systems.particle.render_types.LodestoneWorldParticleRenderType;
+import team.lodestar.lodestone.systems.rendering.rendeertype.RenderTypeToken;
 
 import java.awt.*;
 import java.util.Random;
 
 
 public class BombEngine {
-    protected static final ResourceLocation SHOCK_WAVE = new ResourceLocation(AdvancedAges.MOD_ID,
-            "textures/vfx/shockwave.png");
-    private static final RenderType SHOCK_WAVE_TYPE = LodestoneRenderTypeRegistry.TRANSPARENT_TEXTURE.applyWithModifier(SHOCK_WAVE, b -> b.replaceVertexFormat(VertexFormat.Mode.TRIANGLES));
+    protected static final Identifier SHOCK_WAVE = Mads.getId("textures/vfx/shockwave.png");
+    private static final RenderLayer SHOCK_WAVE_TYPE = LodestoneRenderTypeRegistry.TRANSPARENT_TEXTURE.applyWithModifier(RenderTypeToken.createToken(SHOCK_WAVE), b -> b.replaceVertexFormat(VertexFormat.DrawMode.TRIANGLES));
     public static Color centre = new Color(255, 255, 255);
     public static Color outer = new Color(180, 102, 15);
     public static Color smoke = new Color(0, 0, 0);
@@ -31,13 +36,13 @@ public class BombEngine {
     public static float FIRE_OFFSET = 20f;
     public static float SMOKE_OFFSET = 15;
 
-    public static void spawn(Level level, BlockPos pos, float scalar, boolean smoke, boolean flash, boolean sphere) {
+    public static void spawn(World level, BlockPos pos, float scalar, boolean smoke, boolean flash, boolean sphere) {
         centre(level, pos, scalar);
         if (smoke) {
             smoke(level, pos, scalar);
         }
         if (flash) {
-            ScreenParticleBuilder.create(LodestoneScreenParticleRegistry.WISP, ClientEvents.SCREEN_PARTICLES)
+            ScreenParticleBuilder.create(LodestoneScreenParticleRegistry.WISP, ClientEvents.PARTICLES)
                     .setScaleData(GenericParticleData.create(999999999).setEasing(Easing.EXPO_IN_OUT).build())
                     .setTransparencyData(GenericParticleData.create(.5f, 0).setEasing(Easing.EXPO_OUT).build())
                     .setColorData(ColorParticleData.create(outer, outer).build())
@@ -45,11 +50,11 @@ public class BombEngine {
                     .spawn(pos.getX(), (pos.getZ()));
         }
         if (sphere) {
-            SphereEngine.addSphere(new SphereEngine.TimerGrowingSphere(SHOCK_WAVE_TYPE, pos.getCenter(), 0, 10000, 2000, .5f,null));
+            SphereEngine.addSphere(new SphereEngine.TimerGrowingSphere(SHOCK_WAVE_TYPE, pos.ofCenter(), 0, 10000, 2000, .5f,null));
         }
     }
 
-    public static void centre(Level level, BlockPos pos, float scalar) {
+    public static void centre(World level, BlockPos pos, float scalar) {
         for (int i = 0; i < 400; i++) {
             Random random = new Random();
             WorldParticleBuilder.create(LodestoneParticleRegistry.WISP_PARTICLE)
@@ -77,12 +82,12 @@ public class BombEngine {
                 .setTransparencyData(GenericParticleData.create(.8f).build())
                 .setColorData(ColorParticleData.create(outer, outer).setCoefficient(1.4f).setEasing(Easing.BOUNCE_IN).build())
                 .setLifetime(20)
-                .setSpinData(SpinParticleData.create(0.2f, 0.4f).setSpinOffset((level.getGameTime() * 0.2f) % 6.28f).setEasing(Easing.QUARTIC_IN).build())
+                .setSpinData(SpinParticleData.create(0.2f, 0.4f).setSpinOffset((level.getTime() * 0.2f) % 6.28f).setEasing(Easing.QUARTIC_IN).build())
                 .enableNoClip()
                 .spawn(level, pos.getX(), pos.getY() + 5, pos.getZ());
     }
 
-    public static void smoke(Level level, BlockPos pos, float scalar) {
+    public static void smoke(World level, BlockPos pos, float scalar) {
         for (int i = 0; i < 400; i++) {
             Random random = new Random();
             WorldParticleBuilder.create(LodestoneParticleRegistry.SMOKE_PARTICLE)

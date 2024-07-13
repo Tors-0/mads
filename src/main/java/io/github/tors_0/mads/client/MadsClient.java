@@ -1,6 +1,9 @@
 package io.github.tors_0.mads.client;
 
+import io.github.fabricators_of_create.porting_lib.event.client.RenderPlayerEvents;
 import io.github.tors_0.mads.block.entity.AmmoCrateBlockEntity;
+import io.github.tors_0.mads.client.render.particle.BombEngine;
+import io.github.tors_0.mads.client.render.particle.SphereEngine;
 import io.github.tors_0.mads.client.render.renderer.AmmoCrateBlockEntityRenderer;
 import io.github.tors_0.mads.client.render.renderer.MortarBlockEntityRenderer;
 import io.github.tors_0.mads.client.render.renderer.ShellEntityRenderer;
@@ -18,6 +21,7 @@ import io.github.tors_0.mads.screen.MortarScreen;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
@@ -73,6 +77,21 @@ public class MadsClient implements ClientModInitializer {
                 if (blockEntity == null) return;
                 blockEntity.setInventory(inv);
             });
+        }));
+        ClientPlayNetworking.registerGlobalReceiver(ModNetworking.NUKE_BOOM, ((client, handler, buf, responseSender) -> {
+            BlockPos pos = buf.readBlockPos();
+            float intensity = buf.readFloat();
+            boolean smoke = buf.readBoolean();
+            boolean flash = buf.readBoolean();
+            boolean sphere = buf.readBoolean();
+            client.execute(() -> {
+                BombEngine.spawn(client.world, pos, intensity, smoke, flash, sphere);
+            });
+        }));
+
+        RenderPlayerEvents.PRE.register(((player, renderer, partialTick, matrixStack, buffer, packedLight) -> {
+            SphereEngine.RenderSpheres(player, partialTick, matrixStack);
+            return false;
         }));
     }
 }

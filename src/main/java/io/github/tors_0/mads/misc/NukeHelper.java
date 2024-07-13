@@ -1,14 +1,20 @@
 package io.github.tors_0.mads.misc;
 
 import io.github.tors_0.mads.entity.ShellEntity;
+import io.github.tors_0.mads.network.ModNetworking;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.ExplosionBehavior;
+import org.quiltmc.qsl.networking.api.PacketByteBufs;
+import org.quiltmc.qsl.networking.api.PlayerLookup;
+import org.quiltmc.qsl.networking.api.ServerPlayNetworking;
 import team.lodestar.lodestone.handlers.ScreenshakeHandler;
 import team.lodestar.lodestone.systems.easing.Easing;
 import team.lodestar.lodestone.systems.screenshake.PositionedScreenshakeInstance;
@@ -31,7 +37,18 @@ public class NukeHelper {
     public static void createExplosion(ShellEntity entity) {
         explode(entity.getWorld(), entity.getBlockPos(), 35, true);
 
-        ScreenshakeInstance detonationScreenShake = new PositionedScreenshakeInstance(70, entity.getPos(), 60f, 150f, Easing.CIRC_OUT).setIntensity(1.2f, 0f);
+        if (entity.getWorld() instanceof ServerWorld server) {
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeBlockPos(entity.getBlockPos());
+            buf.writeFloat(1f);
+            buf.writeBoolean(true);
+            buf.writeBoolean(true);
+            buf.writeBoolean(true);
+            ServerPlayNetworking.send(PlayerLookup.around(server, entity.getPos(), 256), ModNetworking.NUKE_BOOM, buf);
+        }
+
+        ScreenshakeInstance detonationScreenShake = new PositionedScreenshakeInstance(70, entity.getPos(),
+                60f, 150f, Easing.CIRC_OUT).setIntensity(1.2f, 0f);
         ScreenshakeHandler.addScreenshake(detonationScreenShake);
     }
 
