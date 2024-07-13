@@ -3,6 +3,7 @@ package io.github.tors_0.mads.entity;
 import com.google.common.collect.Sets;
 import io.github.tors_0.mads.misc.IncendiaryExplosion;
 import io.github.tors_0.mads.misc.IncendiaryExplosionBehavior;
+import io.github.tors_0.mads.misc.NukeHelper;
 import io.github.tors_0.mads.registry.ModEntities;
 import io.github.tors_0.mads.registry.ModItems;
 import net.minecraft.block.AbstractFireBlock;
@@ -37,11 +38,13 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 import net.minecraft.world.explosion.ExplosionBehavior;
+import team.lodestar.lodestone.LodestoneLib;
 import team.lodestar.lodestone.handlers.ScreenshakeHandler;
-import team.lodestar.lodestone.handlers.screenparticle.ParticleEmitterHandler;
-import team.lodestar.lodestone.systems.rendering.particle.Easing;
-import team.lodestar.lodestone.systems.rendering.particle.WorldParticleBuilder;
-import team.lodestar.lodestone.systems.rendering.particle.world.WorldParticleEffect;
+import team.lodestar.lodestone.systems.easing.Easing;
+import team.lodestar.lodestone.systems.particle.render_types.LodestoneWorldParticleRenderType;
+import team.lodestar.lodestone.systems.particle.screen.GenericScreenParticle;
+import team.lodestar.lodestone.systems.particle.world.LodestoneWorldParticle;
+import team.lodestar.lodestone.systems.particle.world.type.LodestoneWorldParticleType;
 import team.lodestar.lodestone.systems.screenshake.PositionedScreenshakeInstance;
 import team.lodestar.lodestone.systems.screenshake.ScreenshakeInstance;
 
@@ -110,7 +113,7 @@ public class ShellEntity extends PersistentProjectileEntity {
         switch (this.dataTracker.get(COLOR)) {
             case -1 -> {
                 this.getWorld().createExplosion(this, this.getDamageSources().explosion(this, this), new ExplosionBehavior(), this.getPos(), 2.3f, false, World.ExplosionSourceType.TNT);
-                detonationScreenShake = new PositionedScreenshakeInstance(35, this.getPos(), 30f, 0f, 45f, Easing.CIRC_IN_OUT).setIntensity(0.3f, 0.5f, 0f);
+                detonationScreenShake = new PositionedScreenshakeInstance(20, this.getPos(), 30f, 45f, Easing.CIRC_OUT).setIntensity(0.6f, 0f);
                 ScreenshakeHandler.addScreenshake(detonationScreenShake);
             }
             case -2 -> {
@@ -129,13 +132,11 @@ public class ShellEntity extends PersistentProjectileEntity {
             }
             case -3 -> {
                 this.getWorld().createExplosion(this, this.getDamageSources().explosion(this, this), new ExplosionBehavior(), this.getPos(), 5f, false, World.ExplosionSourceType.BLOCK);
-                detonationScreenShake = new PositionedScreenshakeInstance(45, this.getPos(), 50f, 0f, 80f, Easing.CIRC_IN_OUT).setIntensity(0.4f, 0.7f, 0f);
+                detonationScreenShake = new PositionedScreenshakeInstance(20, this.getPos(), 50f, 80f, Easing.CIRC_OUT).setIntensity(0.8f, 0f);
                 ScreenshakeHandler.addScreenshake(detonationScreenShake);
             }
             case -4 -> {
-                this.getWorld().createExplosion(this, this.getDamageSources().explosion(this, this), new ExplosionBehavior(), this.getPos(), 29.5f, false, World.ExplosionSourceType.BLOCK);
-                detonationScreenShake = new PositionedScreenshakeInstance(70, this.getPos(), 60f, 0f, 150f, Easing.CIRC_IN_OUT).setIntensity(1f, 5f, 0f);
-                ScreenshakeHandler.addScreenshake(detonationScreenShake);
+                NukeHelper.createExplosion(this);
             }
         }
         this.discard();

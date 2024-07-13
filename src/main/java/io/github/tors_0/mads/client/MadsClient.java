@@ -1,9 +1,9 @@
 package io.github.tors_0.mads.client;
 
 import io.github.tors_0.mads.block.entity.AmmoCrateBlockEntity;
-import io.github.tors_0.mads.client.render.AmmoCrateBlockEntityRenderer;
-import io.github.tors_0.mads.client.render.MortarBlockEntityRenderer;
-import io.github.tors_0.mads.client.render.ShellEntityRenderer;
+import io.github.tors_0.mads.client.render.renderer.AmmoCrateBlockEntityRenderer;
+import io.github.tors_0.mads.client.render.renderer.MortarBlockEntityRenderer;
+import io.github.tors_0.mads.client.render.renderer.ShellEntityRenderer;
 import io.github.tors_0.mads.client.render.model.MortarBlockEntityModel;
 import io.github.tors_0.mads.client.render.model.ShellEntityModel;
 import io.github.tors_0.mads.gui.AmmoCrateGuiDescription;

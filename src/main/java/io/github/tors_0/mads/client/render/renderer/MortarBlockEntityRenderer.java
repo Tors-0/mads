@@ -1,4 +1,4 @@
-package io.github.tors_0.mads.client.render;
+package io.github.tors_0.mads.client.render.renderer;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.tors_0.mads.block.entity.MortarBlockEntity;

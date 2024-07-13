@@ -87,7 +87,7 @@ dependencies {
 
 	modImplementation include("io.github.cottonmc:LibGui:${libs.versions.libgui.get()}")
 
-//	modImplementation("team.lodestar.lodestone:lodestone:${libs.versions.minecraft.get()}-${libs.versions.lodestone.get()}-fabric")
+	modImplementation("team.lodestar.lodestone:lodestone:${libs.versions.minecraft.get()}-${libs.versions.lodestone.get()}-fabric")
 
 // QSL is not a complete API; You will need Quilted Fabric API to fill in the gaps.
 	// Quilted Fabric API will automatically pull in the correct QSL version.
@@ -98,20 +98,20 @@ dependencies {
 		transitive = false
 	}
 
-	modImplementation(libs.midnightLib)
-	include(libs.midnightLib)
+//	modImplementation(libs.midnightLib)
+//	include(libs.midnightLib)
 
 	// lodestone lib
-	modImplementation(libs.lodestoneLib) {
-		transitive = false
-	}
-	include(libs.lodestoneLib)
+//	modImplementation(libs.lodestoneLib) {
+//		transitive = false
+//	}
+//	include(libs.lodestoneLib)
 
 	// iris and sodium
 	modLocalImplementation(libs.sodium)
 	modLocalImplementation(libs.iris)
-	runtimeOnly(libs.jcpp)
-	implementation(libs.glslTransformer)
+//	runtimeOnly(libs.jcpp)
+//	implementation(libs.glslTransformer)
 }
 
 processResources {
