@@ -35,8 +35,6 @@ public class NukeHelper {
     }
 
     public static void createExplosion(ShellEntity entity) {
-        explode(entity.getWorld(), entity.getBlockPos(), 35, true);
-
         if (entity.getWorld() instanceof ServerWorld server) {
             PacketByteBuf buf = PacketByteBufs.create();
             buf.writeBlockPos(entity.getBlockPos());
@@ -47,12 +45,14 @@ public class NukeHelper {
             ServerPlayNetworking.send(PlayerLookup.around(server, entity.getPos(), 256), ModNetworking.NUKE_BOOM, buf);
         }
 
+        explode(entity.getWorld(), entity.getBlockPos(), 35, false);
+
         ScreenshakeInstance detonationScreenShake = new PositionedScreenshakeInstance(70, entity.getPos(),
                 60f, 150f, Easing.CIRC_OUT).setIntensity(1.2f, 0f);
         ScreenshakeHandler.addScreenshake(detonationScreenShake);
     }
 
-    public static void explode(World level, BlockPos pos, int diameter, boolean convert) {
+    public static void explode(World world, BlockPos pos, int diameter, boolean convert) {
         int radius = diameter / 2;
         BlockPos.Mutable mutableBlockPos = new BlockPos.Mutable();
         Random random = new Random();
@@ -62,8 +62,8 @@ public class NukeHelper {
                 for (int z = -radius; z <= radius; z++) {
                     if (x * x + y * y + z * z <= radius * radius) {
                         mutableBlockPos.set(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
-                        if (level.getBlockState(mutableBlockPos).getHardness(level, mutableBlockPos) != -1.0F) {
-                            level.setBlockState(mutableBlockPos, Blocks.AIR.getDefaultState(), 3);
+                        if (world.getBlockState(mutableBlockPos).getHardness(world, mutableBlockPos) != -1.0F) {
+                            world.setBlockState(mutableBlockPos, Blocks.AIR.getDefaultState(), 3);
                         }
                     }
                 }
@@ -76,10 +76,10 @@ public class NukeHelper {
                     for (int z = -outerRadius; z <= outerRadius; z++) {
                         if (x * x + y * y + z * z > radius * radius && x * x + y * y + z * z <= outerRadius * outerRadius) {
                             mutableBlockPos.set(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
-                            if (convertMap.containsKey(level.getBlockState(mutableBlockPos).getBlock())) {
+                            if (convertMap.containsKey(world.getBlockState(mutableBlockPos).getBlock())) {
                                 int chance = random.nextInt(100);
                                 if (chance < 25) {
-                                    level.setBlockState(mutableBlockPos, convertMap.get(level.getBlockState(mutableBlockPos).getBlock()).getDefaultState(), 3);
+                                    world.setBlockState(mutableBlockPos, convertMap.get(world.getBlockState(mutableBlockPos).getBlock()).getDefaultState(), 3);
 
                                 }
                             }
@@ -89,7 +89,7 @@ public class NukeHelper {
             }
         }
         if (diameter >= 20) {
-            int explosionsCount = diameter / 10;
+            int explosionsCount = 2 * (diameter / 10);
             for (int i = 0; i < explosionsCount; i++) {
                 double theta = random.nextDouble() * Math.PI * 2;
                 double phi = random.nextDouble() * Math.PI - Math.PI / 2;
@@ -97,18 +97,18 @@ public class NukeHelper {
                 int y = (int) (radius * Math.sin(phi));
                 int z = (int) (radius * Math.sin(theta) * Math.cos(phi));
                 mutableBlockPos.set(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
-                level.createExplosion(null, mutableBlockPos.getX(), mutableBlockPos.getY(), mutableBlockPos.getZ(), 10.0F, true, World.ExplosionSourceType.TNT);
+                world.createExplosion(null, mutableBlockPos.getX(), mutableBlockPos.getY(), mutableBlockPos.getZ(), 10.0F, false, World.ExplosionSourceType.TNT);
             }
         }
         Box sphereArea = new Box(pos).expand(radius);
-        List<Entity> entitiesWithinSphere = level.getOtherEntities(null, sphereArea);
+        List<Entity> entitiesWithinSphere = world.getOtherEntities(null, sphereArea);
         for (Entity entity : entitiesWithinSphere) {
             double distanceSquared = entity.getPos().squaredDistanceTo(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
             if (distanceSquared <= radius * radius) {
-                entity.damage(level.getDamageSources().explosion(null), 60.0F);
+                entity.damage(world.getDamageSources().explosion(null), 60.0F);
             } else if (distanceSquared <= (radius + 5) * (radius + 5)) {
                 if (entity instanceof PlayerEntity) {
-                    entity.damage(level.getDamageSources().explosion(null), 15.0F);
+                    entity.damage(world.getDamageSources().explosion(null), 15.0F);
                 }
             }
         }
