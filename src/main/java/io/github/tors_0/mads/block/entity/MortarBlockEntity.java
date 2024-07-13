@@ -7,10 +7,14 @@ import io.github.tors_0.mads.item.MortarProjectile;
 import io.github.tors_0.mads.item.ShellItem;
 import io.github.tors_0.mads.network.ModNetworking;
 import io.github.tors_0.mads.registry.ModBlockEntities;
+import io.github.tors_0.mads.registry.ModBlocks;
 import io.github.tors_0.mads.registry.ModItems;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.InventoryProvider;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
@@ -29,6 +33,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.text.data.BlockEntityData;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -57,6 +62,7 @@ public class MortarBlockEntity extends BlockEntity implements ImplementedInvento
     }
 
     private int progress = 0;
+    private int clientProgress = 0;
     private int maxProgress = 72;
 
     public int getRotation() {
@@ -137,13 +143,36 @@ public class MortarBlockEntity extends BlockEntity implements ImplementedInvento
         nbt.putInt("mortar.angle", angle);
     }
 
+    public int getClientProgress() {
+        return clientProgress;
+    }
+
     @Override
     public DefaultedList<ItemStack> getItems() {
         return inventory;
     }
 
+    @Override
+    public boolean onSyncedBlockEvent(int type, int data) {
+        if (type == 1) {
+            this.progress = data;
+            this.clientProgress = data;
+            return true;
+        } else {
+            return super.onSyncedBlockEvent(type, data);
+        }
+    }
+
+    @Override
+    public NbtCompound toSyncedNbt() {
+        return this.toNbt();
+    }
+
     public void tick(World world, BlockPos blockPos, BlockState blockState) {
-        if (world.isClient) return;
+        if (world.isClient) {
+            if (clientProgress < maxProgress) this.clientProgress++;
+            return;
+        }
         this.time++;
         if (this.time >= 20) {
             PacketByteBuf buf = PacketByteBufs.create();
@@ -154,16 +183,14 @@ public class MortarBlockEntity extends BlockEntity implements ImplementedInvento
             this.time = 0;
         }
 
-        if (this.hasRecipe() && (this.progress > 0 || this.getWorld().isReceivingRedstonePower(blockPos))) {
-            this.increaseLaunchProgress();
-            markDirty(world, blockPos, blockState);
-
+        this.increaseLaunchProgress();
+        if (this.hasRecipe() && this.getWorld().isReceivingRedstonePower(blockPos)) {
             if (this.hasLaunchingFinished()) {
                 this.launch();
                 this.resetProgress();
+                getWorld().addSyncedBlockEvent(getPos(), ModBlocks.MORTAR, 1, this.progress);
             }
-        } else {
-            this.resetProgress();
+            markDirty(world, blockPos, blockState);
         }
     }
 

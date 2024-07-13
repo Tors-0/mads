@@ -16,6 +16,7 @@ public class MortarBlockEntityModel<T extends MortarBlockEntity> extends Model {
     private final ModelPart assembly;
     private final ModelPart mounts;
     private final ModelPart mortar;
+    private final ModelPart barrel2;
     private final ModelPart bone;
 
     public MortarBlockEntityModel(ModelPart root) {
@@ -23,6 +24,7 @@ public class MortarBlockEntityModel<T extends MortarBlockEntity> extends Model {
         this.assembly = root.getChild("assembly");
         this.mounts = assembly.getChild("mounts");
         this.mortar = assembly.getChild("mortar");
+        this.barrel2 = mortar.getChild("barrel2");
         this.bone = root.getChild("bone");
     }
 
@@ -49,8 +51,10 @@ public class MortarBlockEntityModel<T extends MortarBlockEntity> extends Model {
         ModelPartData mortar = assembly.addChild("mortar", ModelPartBuilder.create(), ModelTransform.of(0f, -5.5f, 0f,0,0,0));
 
         mortar.addChild("barrel", ModelPartBuilder.create()
-                        .uv(1, 65).cuboid(-3.0F, -36.0F, -3.0F, 6.0F, 16.0F, 6.0F, new Dilation(0.0F))
                         .uv(0, 33).cuboid(-4.0F, -21.0F, -4.0F, 8.0F, 24.0F, 8.0F, new Dilation(0.0F)),
+                ModelTransform.of(0.0F, 0.0F, 0.0F,0,0,0));
+        mortar.addChild("barrel2", ModelPartBuilder.create()
+                        .uv(1, 65).cuboid(-3.0F, -36.0F, -3.0F, 6.0F, 16.0F, 6.0F, new Dilation(0.0F)),
                 ModelTransform.of(0.0F, 0.0F, 0.0F,0,0,0));
 
         ModelPartData bone = modelPartData.addChild("bone", ModelPartBuilder.create().uv(0, 0)
@@ -61,6 +65,7 @@ public class MortarBlockEntityModel<T extends MortarBlockEntity> extends Model {
     }
 
     public void setAngles(MortarBlockEntity entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
+        this.barrel2.scaleY = 0.6f + (0.4f * animationProgress / entity.getPropertyDelegate().get(1));
         this.assembly.yaw = (float) ((Math.PI / 180.0) * (headYaw));
         this.mortar.pitch = (float) ((Math.PI / 180.0) * (90 - headPitch));
     }

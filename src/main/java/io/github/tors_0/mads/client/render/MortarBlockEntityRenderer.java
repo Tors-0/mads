@@ -29,7 +29,7 @@ public class MortarBlockEntityRenderer<T extends MortarBlockEntity, M extends Mo
         float n = 0.0F;
         float o = 0.0F;
 
-        this.model.setAngles(mortar, o, n, 0, h, m);
+        this.model.setAngles(mortar, o, n, mortar.getClientProgress(), h, m);
         RenderLayer renderLayer = RenderLayer.getEntitySolid(MortarBlockEntityModel.IDENTIFIER);
         if (renderLayer != null) {
             VertexConsumer vertexConsumer = vertexConsumers.getBuffer(renderLayer);

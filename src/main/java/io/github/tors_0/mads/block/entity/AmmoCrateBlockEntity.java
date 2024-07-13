@@ -6,6 +6,7 @@ import io.github.tors_0.mads.item.MortarProjectile;
 import io.github.tors_0.mads.network.ModNetworking;
 import io.github.tors_0.mads.registry.ModBlockEntities;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.BrewingStandBlock;
 import net.minecraft.block.InventoryProvider;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -38,6 +39,11 @@ public class AmmoCrateBlockEntity extends BlockEntity implements ImplementedInve
     private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(16, ItemStack.EMPTY);
     protected final PropertyDelegate propertyDelegate;
     private boolean inventoryDirty;
+
+    @Override
+    public NbtCompound toSyncedNbt() {
+        return this.toNbt();
+    }
 
     public void markInventoryDirty() {
         inventoryDirty = true;
