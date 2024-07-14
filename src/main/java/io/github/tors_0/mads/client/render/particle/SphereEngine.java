@@ -14,6 +14,12 @@ import java.util.Comparator;
 import java.util.List;
 
 /// thanks to donut for helping with getting this working
+/**
+ * Thanks to makozort for providing the basis for this class:
+ *  <a href="https://github.com/makozort">Makozort on GitHub</a><br>
+ *  As a result of this contribution, the contents of this class do not fall under the ARR license
+ *  the rest of the project is bound by. This class is under a GPLv3.0 License
+ */
 @ClientOnly
 public class SphereEngine {
 

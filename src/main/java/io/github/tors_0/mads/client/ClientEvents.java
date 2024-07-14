@@ -1,7 +1,5 @@
 package io.github.tors_0.mads.client;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
 import team.lodestar.lodestone.handlers.screenparticle.ParticleEmitterHandler;
 import team.lodestar.lodestone.systems.particle.screen.ScreenParticleHolder;
 

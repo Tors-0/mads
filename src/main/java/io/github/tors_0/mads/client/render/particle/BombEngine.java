@@ -24,6 +24,12 @@ import java.awt.*;
 import java.util.Random;
 
 
+/**
+ * Thanks to makozort for providing the basis for this class:
+ *  <a href="https://github.com/makozort">Makozort on GitHub</a><br>
+ *  As a result of this contribution, the contents of this class do not fall under the ARR license
+ *  the rest of the project is bound by. This class is under a GPLv3.0 License
+ */
 public class BombEngine {
     protected static final Identifier SHOCK_WAVE = Mads.getId("textures/vfx/shockwave.png");
     private static final RenderLayer SHOCK_WAVE_TYPE = LodestoneRenderTypeRegistry.TRANSPARENT_TEXTURE.applyWithModifier(RenderTypeToken.createToken(SHOCK_WAVE), b -> b.replaceVertexFormat(VertexFormat.DrawMode.TRIANGLES));
@@ -57,7 +63,7 @@ public class BombEngine {
     public static void centre(World level, BlockPos pos, float scalar) {
         for (int i = 0; i < 400; i++) {
             Random random = new Random();
-            WorldParticleBuilder.create(LodestoneParticleRegistry.WISP_PARTICLE)
+            WorldParticleBuilder.create(LodestoneParticleRegistry.STAR_PARTICLE)
                     .setScaleData(GenericParticleData.create((MAX_EXPLOSION_SCALE * scalar) / 2).setEasing(Easing.EXPO_IN_OUT).build())
                     .setTransparencyData(GenericParticleData.create(.5f, 0).build())
                     .setColorData(ColorParticleData.create(centre, centre).build())
@@ -98,7 +104,6 @@ public class BombEngine {
                     .setTransparencyData(GenericParticleData.create(.2f, 0).build())
                     .enableForcedSpawn()
                     .setColorData(ColorParticleData.create(outer, smoke).setEasing(Easing.BOUNCE_OUT).build())
-                    .setRenderType(LodestoneWorldParticleRenderType.ADDITIVE.withDepthFade())
                     .setLifetime(2000)
                     .setDiscardFunction(SimpleParticleOptions.ParticleDiscardFunctionType.ENDING_CURVE_INVISIBLE)
                     .setRandomMotion(.2, 0, .2)
@@ -112,7 +117,6 @@ public class BombEngine {
                     .setTransparencyData(GenericParticleData.create(.2f, 0).build())
                     .enableForcedSpawn()
                     .setColorData(ColorParticleData.create(smoke, outer).setEasing(Easing.BOUNCE_OUT).build())
-                    .setRenderType(LodestoneWorldParticleRenderType.ADDITIVE.withDepthFade())
                     .setLifetime(2000)
                     .setDiscardFunction(SimpleParticleOptions.ParticleDiscardFunctionType.ENDING_CURVE_INVISIBLE)
                     .setRandomMotion(.3 * ((double) i / 2), 0, .3 * ((double) i / 2))
@@ -126,7 +130,6 @@ public class BombEngine {
                     .setTransparencyData(GenericParticleData.create(.2f, 0).build())
                     .enableForcedSpawn()
                     .setColorData(ColorParticleData.create(smoke, smoke).setEasing(Easing.BOUNCE_OUT).build())
-                    .setRenderType(LodestoneWorldParticleRenderType.ADDITIVE.withDepthFade())
                     .setLifetime(2000)
                     .setDiscardFunction(SimpleParticleOptions.ParticleDiscardFunctionType.ENDING_CURVE_INVISIBLE)
                     .setRandomMotion(.2, 0, .2)
@@ -140,7 +143,6 @@ public class BombEngine {
                     .setTransparencyData(GenericParticleData.create(.2f, 0).build())
                     .enableForcedSpawn()
                     .setColorData(ColorParticleData.create(outer, smoke).setEasing(Easing.BOUNCE_OUT).build())
-                    .setRenderType(LodestoneWorldParticleRenderType.ADDITIVE.withDepthFade())
                     .setLifetime(2000)
                     .setRenderType(LodestoneWorldParticleRenderType.LUMITRANSPARENT)
                     .setDiscardFunction(SimpleParticleOptions.ParticleDiscardFunctionType.ENDING_CURVE_INVISIBLE)
